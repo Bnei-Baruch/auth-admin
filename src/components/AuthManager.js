@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import {Button, Container, Segment, Select, Table, Icon, Input} from "semantic-ui-react";
+import {Button, Container, Segment, Select, Table, Icon, Menu} from "semantic-ui-react";
 import {getAuthData} from "../shared/tools";
-import {AUTH_API_APPR, AUTH_API_USERS} from "../shared/env";
+import {AUTH_API, PENDING_ID} from "../shared/env";
 
 class AuthManager extends Component {
 
@@ -14,7 +14,7 @@ class AuthManager extends Component {
     };
 
     componentDidMount() {
-        getAuthData(`${AUTH_API_USERS}`, (users) => {
+        getAuthData(`${AUTH_API}/users/${PENDING_ID}`, (users) => {
             this.setState({users});
         });
     };
@@ -26,7 +26,22 @@ class AuthManager extends Component {
     approveUser = () => {
         const {selected_user,users} = this.state;
         console.log(selected_user);
-        getAuthData(`${AUTH_API_APPR}/${selected_user}`, (response) => {
+        getAuthData(`${AUTH_API}/approve/${selected_user}`, (response) => {
+            for (let i = 0; i < users.length; i++) {
+                if (users[i].id === selected_user) {
+                    users.splice(i, 1);
+                    this.setState({selected_user: "",users});
+                    break;
+                }
+            }
+            alert(response.result);
+        });
+    }
+
+    removeUser = () => {
+        const {selected_user,users} = this.state;
+        console.log(selected_user);
+        getAuthData(`${AUTH_API}/remove/${selected_user}`, (response) => {
             for (let i = 0; i < users.length; i++) {
                 if (users[i].id === selected_user) {
                     users.splice(i, 1);
@@ -44,7 +59,7 @@ class AuthManager extends Component {
     }
 
     render() {
-        const {users,selected_user,input} = this.state;
+        const {users,selected_user} = this.state;
 
         let users_list = users.map((data, i) => {
             const { id, email } = data;
@@ -67,25 +82,31 @@ class AuthManager extends Component {
 
         return (
             <Container fluid >
-                <Segment.Group horizontal>
-                    <Segment>
+                <Menu size='large' secondary>
+                    <Menu.Item>
                         <Select
                             search
                             error={!selected_user}
                             value={selected_user}
                             options={users_list}
-                            placeholder='Select user'
+                            placeholder='Search...'
                             onChange={(e, { value }) => this.selectUser(value)} />
-                        <Button color='red' disabled={!selected_user} onClick={this.approveUser}>Approve</Button>
-                    </Segment>
-                    <Segment>
-                        <Input type='text' placeholder='Type mail...' action
-                               value={input} onChange={e => this.setState({input:e.target.value})}>
-                            <input />
-                            <Button positive type='submit' disabled={input === ""} onClick={this.setRequest}>Request</Button>
-                        </Input>
-                    </Segment>
-                </Segment.Group>
+                    </Menu.Item>
+                    <Menu.Menu position='left'>
+                        <Menu.Item>
+                            <Button color='green' disabled={!selected_user} onClick={this.approveUser}>Approve</Button>
+                        </Menu.Item>
+                        <Menu.Item>
+                        </Menu.Item>
+                    </Menu.Menu>
+                    <Menu.Menu position='right'>
+                        <Menu.Item>
+                        </Menu.Item>
+                        <Menu.Item>
+                            <Button color='red' disabled={!selected_user} icon='close' onClick={this.removeUser} />
+                        </Menu.Item>
+                    </Menu.Menu>
+                </Menu>
                 <Segment textAlign='center' className="group_list" raised>
                     <Table selectable compact='very' basic structured className="admin_table" unstackable>
                         <Table.Body>

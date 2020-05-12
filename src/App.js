@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Tab } from 'semantic-ui-react'
+import {Container, Tab} from 'semantic-ui-react'
 import 'semantic-ui-css/semantic.min.css';
 import './App.css';
 import LoginPage from './components/LoginPage';
@@ -40,9 +40,9 @@ class App extends Component {
     const wf_panes = panes.filter(p => !p.menuItem.disabled);
 
     return (
-
-        <Tab menu={{ secondary: true, pointing: true, color: "blue" }} panes={wf_panes} />
-
+        <Container >
+          <Tab menu={{ secondary: true, pointing: true, color: "blue" }} panes={wf_panes} />
+        </Container>
     );
   }
 }
