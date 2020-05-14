@@ -15,6 +15,11 @@ class AuthManager extends Component {
 
     componentDidMount() {
         getAuthData(`${AUTH_API}/users/${PENDING_ID}`, (users) => {
+            users.sort((a, b) => {
+                if (a.createdTimestamp < b.createdTimestamp) return 1;
+                if (a.createdTimestamp > b.createdTimestamp) return -1;
+                return 0;
+            });
             this.setState({users});
         });
     };
@@ -67,7 +72,8 @@ class AuthManager extends Component {
         });
 
         let users_content = users.map(user => {
-            const {id,firstName,lastName,emailVerified,email} = user;
+            const {id,firstName,lastName,emailVerified,email,createdTimestamp} = user;
+            const reg_time = new Date(createdTimestamp).toUTCString();
             return (
                 <Table.Row key={id}
                            active={id === selected_user}
@@ -76,6 +82,7 @@ class AuthManager extends Component {
                     <Table.Cell>{<Icon name={emailVerified ? 'checkmark' : 'close'} />} - {email}</Table.Cell>
                     <Table.Cell>{firstName}</Table.Cell>
                     <Table.Cell>{lastName}</Table.Cell>
+                    <Table.Cell>{reg_time}</Table.Cell>
                 </Table.Row>
             )
         })
@@ -113,7 +120,8 @@ class AuthManager extends Component {
                             <Table.Row disabled>
                                 <Table.Cell width={2}>Email</Table.Cell>
                                 <Table.Cell width={2}>First Name</Table.Cell>
-                                <Table.Cell width={3}>Last Name</Table.Cell>
+                                <Table.Cell width={2}>Last Name</Table.Cell>
+                                <Table.Cell width={2}>Reg Time</Table.Cell>
                             </Table.Row>
                             {users_content}
                         </Table.Body>
