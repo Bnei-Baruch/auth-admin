@@ -34,6 +34,7 @@
 }
 
 .group_list {
+  font-size: 13px!important;
   overflow-y:scroll;
   top:0px; left:0px;
   width:100%;
