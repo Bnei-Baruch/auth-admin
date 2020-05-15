@@ -4,7 +4,8 @@ import 'semantic-ui-css/semantic.min.css';
 import './App.css';
 import LoginPage from './components/LoginPage';
 import {client} from "./components/UserManager";
-import AuthManager from "./components/AuthManager";
+import PendingUsers from "./components/PendingUsers";
+import VerifyUsers from "./components/VerifyUsers";
 
 
 class App extends Component {
@@ -34,7 +35,9 @@ class App extends Component {
       { menuItem: { key: 'Home', icon: 'home', content: 'Home', disabled: false },
         render: () => <Tab.Pane attached={true} >{login}</Tab.Pane> },
       { menuItem: { key: 'pending', icon: 'tasks', content: 'Pending', disabled: !gxy_root },
-        render: () => <Tab.Pane attached={false} ><AuthManager user={user} /></Tab.Pane> },
+        render: () => <Tab.Pane attached={false} ><PendingUsers user={user} /></Tab.Pane> },
+      { menuItem: { key: 'verify', icon: 'registered', content: 'Verify', disabled: !gxy_root },
+        render: () => <Tab.Pane attached={false} ><VerifyUsers user={user} /></Tab.Pane> },
     ];
 
     const wf_panes = panes.filter(p => !p.menuItem.disabled);

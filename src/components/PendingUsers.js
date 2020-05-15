@@ -3,7 +3,7 @@ import {Button, Container, Segment, Select, Table, Icon, Menu} from "semantic-ui
 import {getAuthData} from "../shared/tools";
 import {AUTH_API, PENDING_ID} from "../shared/env";
 
-class AuthManager extends Component {
+class PendingUsers extends Component {
 
     state = {
         users: [],
@@ -132,4 +132,4 @@ class AuthManager extends Component {
     }
 }
 
-export default AuthManager;
+export default PendingUsers;
