@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {Button, Container, Segment, Select, Table, Icon, Menu} from "semantic-ui-react";
+import {Button, Container, Segment, Select, Table, Icon, Menu, Divider} from "semantic-ui-react";
 import {getAuthData} from "../shared/tools";
 import {AUTH_API, PENDING_ID} from "../shared/env";
 
@@ -7,6 +7,8 @@ class PendingUsers extends Component {
 
     state = {
         users: [],
+        pending_users: [],
+        request_users: [],
         selected_user: "",
         disabled: true,
         loading: true,
@@ -15,12 +17,23 @@ class PendingUsers extends Component {
 
     componentDidMount() {
         getAuthData(`${AUTH_API}/users/${PENDING_ID}`, (users) => {
-            users.sort((a, b) => {
+            let pending_users = [];
+            let request_users = [];
+
+            for(let i=0; i<users.length; i++){
+                if(users[i].attributes && users[i].attributes.request) {
+                    request_users.push(users[i]);
+                } else {
+                    pending_users.push(users[i]);
+                }
+            }
+
+            pending_users.sort((a, b) => {
                 if (a.createdTimestamp < b.createdTimestamp) return 1;
                 if (a.createdTimestamp > b.createdTimestamp) return -1;
                 return 0;
             });
-            this.setState({users, loading: false});
+            this.setState({users: pending_users, loading: false, request_users});
         });
     };
 
@@ -64,12 +77,31 @@ class PendingUsers extends Component {
     }
 
     render() {
-        const {users,selected_user,loading} = this.state;
+        const {users,request_users,selected_user,loading} = this.state;
 
         let users_list = users.map((data, i) => {
             const { id, email } = data;
             return ({ key: i, text: email, value: id });
         });
+
+        let users_request = request_users.map(user => {
+            const {id,firstName,lastName,emailVerified,email,createdTimestamp,attributes} = user;
+            const request = attributes && attributes.request !== undefined;
+            const req_user = request ? attributes.request[0] : "";
+            const reg_time = new Date(createdTimestamp).toUTCString();
+            return (
+                <Table.Row key={id}
+                           active={id === selected_user}
+                           negative={!emailVerified}
+                           positive={request} >
+                    <Table.Cell>{email}</Table.Cell>
+                    <Table.Cell>{firstName}</Table.Cell>
+                    <Table.Cell>{lastName}</Table.Cell>
+                    <Table.Cell>{reg_time}</Table.Cell>
+                    <Table.Cell><b>{req_user}</b></Table.Cell>
+                </Table.Row>
+            )
+        })
 
         let users_content = users.map(user => {
             const {id,firstName,lastName,emailVerified,email,createdTimestamp} = user;
@@ -118,10 +150,23 @@ class PendingUsers extends Component {
                     <Table selectable compact='very' basic structured className="admin_table" unstackable>
                         <Table.Body>
                             <Table.Row disabled>
-                                <Table.Cell width={2}>Email</Table.Cell>
+                                <Table.Cell width={3}>Email</Table.Cell>
                                 <Table.Cell width={2}>First Name</Table.Cell>
-                                <Table.Cell width={2}>Last Name</Table.Cell>
-                                <Table.Cell width={2}>Reg Time</Table.Cell>
+                                <Table.Cell width={3}>Last Name</Table.Cell>
+                                <Table.Cell width={3}>Reg Time</Table.Cell>
+                                <Table.Cell width={1}>Send to</Table.Cell>
+                            </Table.Row>
+                            {users_request}
+                        </Table.Body>
+                    </Table>
+                    <Divider />
+                    <Table selectable compact='very' basic structured className="admin_table" unstackable>
+                        <Table.Body>
+                            <Table.Row disabled>
+                                <Table.Cell width={3}>Email</Table.Cell>
+                                <Table.Cell width={2}>First Name</Table.Cell>
+                                <Table.Cell width={3}>Last Name</Table.Cell>
+                                <Table.Cell width={3}>Reg Time</Table.Cell>
                             </Table.Row>
                             {users_content}
                         </Table.Body>
