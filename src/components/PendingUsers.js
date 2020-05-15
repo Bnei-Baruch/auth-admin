@@ -20,7 +20,7 @@ class PendingUsers extends Component {
                 if (a.createdTimestamp > b.createdTimestamp) return -1;
                 return 0;
             });
-            this.setState({users});
+            this.setState({users, loading: false});
         });
     };
 
@@ -64,7 +64,7 @@ class PendingUsers extends Component {
     }
 
     render() {
-        const {users,selected_user} = this.state;
+        const {users,selected_user,loading} = this.state;
 
         let users_list = users.map((data, i) => {
             const { id, email } = data;
@@ -114,7 +114,7 @@ class PendingUsers extends Component {
                         </Menu.Item>
                     </Menu.Menu>
                 </Menu>
-                <Segment textAlign='center' className="group_list" raised>
+                <Segment textAlign='center' className="group_list" raised loading={loading} >
                     <Table selectable compact='very' basic structured className="admin_table" unstackable>
                         <Table.Body>
                             <Table.Row disabled>

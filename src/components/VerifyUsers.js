@@ -15,7 +15,7 @@ class VerifyUsers extends Component {
 
     componentDidMount() {
         getAuthData(`${AUTH_API}/vusers`, (users) => {
-            this.setState({users});
+            this.setState({users, loading: false});
         });
     };
 
@@ -25,7 +25,7 @@ class VerifyUsers extends Component {
     };
 
     render() {
-        const {users,selected_user} = this.state;
+        const {users,selected_user,loading} = this.state;
 
         let users_content = users.map(user => {
             const {id,firstName,lastName,emailVerified,email,attributes} = user;
@@ -61,7 +61,7 @@ class VerifyUsers extends Component {
                         </Menu.Item>
                     </Menu.Menu>
                 </Menu>
-                <Segment textAlign='center' className="group_list" raised>
+                <Segment textAlign='center' className="group_list" raised loading={loading}>
                     <Table selectable compact='very' basic structured className="admin_table" unstackable>
                         <Table.Body>
                             <Table.Row disabled>
