@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {Container, Segment, Table, Icon, Menu} from "semantic-ui-react";
+import {Container, Segment, Table, Icon, Menu, Popup, Label} from "semantic-ui-react";
 import {getAuthData} from "../shared/tools";
 import {AUTH_API} from "../shared/env";
 
@@ -30,6 +30,12 @@ class VerifyUsers extends Component {
         let users_content = users.map(user => {
             const {id,firstName,lastName,emailVerified,email,attributes} = user;
             const verify = attributes.approved[0];
+            const emails_count = attributes.approved.length;
+            const popup = emails_count > 1 ? <Popup on='hover' position='top right' trigger={
+                <Label><Icon name='mail' />{emails_count}</Label>
+            } content={
+                attributes.approved.map(data => {return (<p key={data}>{data}</p>)})
+            } /> : "";
             return (
                 <Table.Row key={id}
                            active={id === selected_user}
@@ -39,6 +45,7 @@ class VerifyUsers extends Component {
                     <Table.Cell>{firstName}</Table.Cell>
                     <Table.Cell>{lastName}</Table.Cell>
                     <Table.Cell><Icon name='checkmark' /> {verify}</Table.Cell>
+                    <Table.Cell>{popup}</Table.Cell>
                 </Table.Row>
             )
         })
@@ -69,6 +76,7 @@ class VerifyUsers extends Component {
                                 <Table.Cell width={2}>First Name</Table.Cell>
                                 <Table.Cell width={2}>Last Name</Table.Cell>
                                 <Table.Cell width={2}>Verify</Table.Cell>
+                                <Table.Cell width={1}>Count</Table.Cell>
                             </Table.Row>
                             {users_content}
                         </Table.Body>
