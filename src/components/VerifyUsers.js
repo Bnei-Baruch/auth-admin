@@ -95,11 +95,11 @@ class VerifyUsers extends Component {
                     <Table selectable compact='very' basic structured className="admin_table" unstackable>
                         <Table.Body>
                             <Table.Row disabled>
-                                <Table.Cell width={2}>Email</Table.Cell>
+                                <Table.Cell width={3}>Email</Table.Cell>
                                 <Table.Cell width={2}>First Name</Table.Cell>
                                 <Table.Cell width={2}>Last Name</Table.Cell>
-                                <Table.Cell width={2}>Reg Time</Table.Cell>
-                                <Table.Cell width={1}>Ignored by</Table.Cell>
+                                <Table.Cell width={3}>Reg Time</Table.Cell>
+                                <Table.Cell width={2}>Ignored by</Table.Cell>
                             </Table.Row>
                             {users_ignored}
                         </Table.Body>
@@ -108,10 +108,10 @@ class VerifyUsers extends Component {
                     <Table selectable compact='very' basic structured className="admin_table" unstackable>
                         <Table.Body>
                             <Table.Row disabled>
-                                <Table.Cell width={2}>Email</Table.Cell>
+                                <Table.Cell width={3}>Email</Table.Cell>
                                 <Table.Cell width={2}>First Name</Table.Cell>
                                 <Table.Cell width={2}>Last Name</Table.Cell>
-                                <Table.Cell width={2}>Verify</Table.Cell>
+                                <Table.Cell width={3}>Verify</Table.Cell>
                                 <Table.Cell width={1}>Count</Table.Cell>
                             </Table.Row>
                             {users_content}

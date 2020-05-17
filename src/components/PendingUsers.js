@@ -152,7 +152,7 @@ class PendingUsers extends Component {
                             <Table.Row disabled>
                                 <Table.Cell width={3}>Email</Table.Cell>
                                 <Table.Cell width={2}>First Name</Table.Cell>
-                                <Table.Cell width={3}>Last Name</Table.Cell>
+                                <Table.Cell width={2}>Last Name</Table.Cell>
                                 <Table.Cell width={3}>Reg Time</Table.Cell>
                                 <Table.Cell width={1}>Send to</Table.Cell>
                             </Table.Row>
@@ -165,7 +165,7 @@ class PendingUsers extends Component {
                             <Table.Row disabled>
                                 <Table.Cell width={3}>Email</Table.Cell>
                                 <Table.Cell width={2}>First Name</Table.Cell>
-                                <Table.Cell width={3}>Last Name</Table.Cell>
+                                <Table.Cell width={2}>Last Name</Table.Cell>
                                 <Table.Cell width={3}>Reg Time</Table.Cell>
                             </Table.Row>
                             {users_content}
