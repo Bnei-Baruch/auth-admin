@@ -3,7 +3,7 @@ import {Container, Tab} from 'semantic-ui-react'
 import 'semantic-ui-css/semantic.min.css';
 import './App.css';
 import LoginPage from './components/LoginPage';
-import {client} from "./components/UserManager";
+import {kc} from "./components/UserManager";
 import PendingUsers from "./components/PendingUsers";
 import VerifyUsers from "./components/VerifyUsers";
 
@@ -16,12 +16,12 @@ class App extends Component {
   };
 
   checkPermission = (user) => {
-    let gxy_root = !!user.roles.find(role => role === 'gxy_root');
+    const gxy_root = kc.hasRealmRole("gxy_root");
     if(gxy_root) {
       this.setState({user, gxy_root});
     } else {
       alert("Access denied!");
-      client.signoutRedirect();
+      kc.logout();
     }
   };
 

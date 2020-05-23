@@ -1,57 +1,62 @@
-import { Log as oidclog, UserManager } from 'oidc-client';
-import {KJUR} from 'jsrsasign';
-
-export const AUTH_URL = 'https://accounts.kbb1.com/auth/realms/main';
-export const BASE_URL = process.env.NODE_ENV === 'production' ? process.env.REACT_APP_ACC_URL : 'http://localhost:3000/';
-
-oidclog.logger = console;
-oidclog.level  = 0;
+import Keycloak from 'keycloak-js';
 
 const userManagerConfig = {
-    authority: AUTH_URL,
-    client_id: 'galaxy',
-    redirect_uri: `${BASE_URL}`,
-    response_type: 'token id_token',
+    url: 'https://accounts.kbb1.com/auth',
+    realm: 'main',
+    clientId: 'galaxy',
     scope: 'profile',
-    post_logout_redirect_uri: `${BASE_URL}`,
-    automaticSilentRenew: true,
-    silent_redirect_uri: `${BASE_URL}/silent_renew.html`,
-    filterProtocolClaims: true,
-    loadUserInfo: true,
+    enableLogging: true,
 };
 
-export const client = new UserManager(userManagerConfig);
+export const kc = new Keycloak(userManagerConfig);
 
-client.events.addAccessTokenExpiring(() => {
-    console.log("...RENEW TOKEN...");
-});
+kc.onTokenExpired = () => {
+    console.debug(" -- Renew token -- ");
+    renewToken(0);
+};
 
-client.events.addAccessTokenExpired((data) => {
-    console.log("...!TOKEN EXPIRED!...");
-    client.signoutRedirect();
-});
+kc.onAuthLogout = () => {
+    console.debug("-- Detect clearToken --");
+    kc.logout();
+}
 
-client.events.addUserSignedOut(() => {
-    console.log("...LOGOUT EVENT...");
-    client.signoutRedirect();
-});
-
-client.events.addSilentRenewError((error) =>{
-    console.error("Silent Renew Error: " + error);
-});
-
-export const getUser = (cb) =>
-    client.getUser().then((user) => {
-        if(user) {
-            let at = KJUR.jws.JWS.parse(user.access_token);
-            let roles = at.payloadObj.realm_access.roles;
-            const {sub,given_name,name,email,group,title} = user.profile;
-            user = {id: sub, username: given_name, name, title: title || given_name, group, email, roles}
-        }
-        cb(user)
-    })
-        .catch((error) => {
-            console.log("Error: ",error);
+const renewToken = (retry) => {
+    kc.updateToken(70)
+        .then(refreshed => {
+            if(refreshed) {
+                console.debug("-- Refreshed --");
+            } else {
+                console.warn('Token is still valid?..');
+            }
+        })
+        .catch(err => {
+            retry++;
+            if(retry > 5) {
+                console.error("Refresh retry: failed");
+                console.debug("-- Refresh Failed --");
+                kc.clearToken();
+            } else {
+                setTimeout(() => {
+                    console.error("Refresh retry: " + retry);
+                    renewToken(retry);
+                }, 10000);
+            }
         });
+}
 
-export default client;
+
+
+export const getUser = (callback) => {
+    kc.init({onLoad: 'check-sso', checkLoginIframe: false, flow: 'standard', pkceMethod: 'S256'})
+        .then(authenticated => {
+            if(authenticated) {
+                const {realm_access: {roles},sub,given_name,name,email} = kc.tokenParsed;
+                let user = {id: sub, title: given_name, username: given_name, name, email, roles};
+                callback(user)
+            } else {
+                callback(null)
+            }
+        }).catch((err) => console.log(err));
+};
+
+export default kc;

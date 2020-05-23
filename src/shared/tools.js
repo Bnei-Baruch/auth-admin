@@ -1,14 +1,8 @@
-import {AUTH_URL} from "../components/UserManager";
-
-export const getToken = () => {
-    let jwt = sessionStorage.getItem(`oidc.user:${AUTH_URL}:galaxy`);
-    let json = JSON.parse(jwt);
-    return json.access_token;
-};
+import kc from "../components/UserManager";
 
 export const getAuthData = (url, cb) => fetch(`${url}`, {
     headers: {
-        'Authorization': 'bearer ' + getToken(),
+        'Authorization': 'bearer ' + kc.token,
         'Content-Type': 'application/json'
     }
 }).then((response) => {
