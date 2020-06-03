@@ -33,6 +33,13 @@ class PendingUsers extends Component {
                 if (a.createdTimestamp > b.createdTimestamp) return -1;
                 return 0;
             });
+
+            request_users.sort((a, b) => {
+                if (a.attributes.timestamp[0] < b.attributes.timestamp[0]) return 1;
+                if (a.attributes.timestamp[0] > b.attributes.timestamp[0]) return -1;
+                return 0;
+            });
+
             this.setState({users: pending_users, loading: false, request_users});
         });
     };
@@ -77,7 +84,7 @@ class PendingUsers extends Component {
     }
 
     render() {
-        const {users,request_users,selected_user,loading} = this.state;
+        const {users, request_users,selected_user,loading} = this.state;
 
         let users_list = users.map((data, i) => {
             const { id, email } = data;
@@ -85,19 +92,21 @@ class PendingUsers extends Component {
         });
 
         let users_request = request_users.map(user => {
-            const {id,firstName,lastName,emailVerified,email,createdTimestamp,attributes} = user;
+            const {id,firstName,lastName,emailVerified,email,attributes} = user;
             const request = attributes && attributes.request !== undefined;
             const req_user = request ? attributes.request[0] : "";
-            const reg_time = new Date(createdTimestamp).toUTCString();
+            const timestamp = request ? parseInt(attributes.timestamp[0]) : "0";
+            const req_time = new Date(timestamp).toUTCString();
             return (
                 <Table.Row key={id}
                            active={id === selected_user}
                            negative={!emailVerified}
-                           positive={request} >
+                           positive={request}
+                           onClick={() => console.log(user)} >
                     <Table.Cell>{email}</Table.Cell>
                     <Table.Cell>{firstName}</Table.Cell>
                     <Table.Cell>{lastName}</Table.Cell>
-                    <Table.Cell>{reg_time}</Table.Cell>
+                    <Table.Cell>{req_time}</Table.Cell>
                     <Table.Cell><b>{req_user}</b></Table.Cell>
                 </Table.Row>
             )
@@ -153,7 +162,7 @@ class PendingUsers extends Component {
                                 <Table.Cell width={3}>Email</Table.Cell>
                                 <Table.Cell width={2}>First Name</Table.Cell>
                                 <Table.Cell width={2}>Last Name</Table.Cell>
-                                <Table.Cell width={3}>Reg Time</Table.Cell>
+                                <Table.Cell width={3}>Request Time</Table.Cell>
                                 <Table.Cell width={1}>Send to</Table.Cell>
                             </Table.Row>
                             {users_request}
