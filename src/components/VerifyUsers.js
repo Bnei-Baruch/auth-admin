@@ -33,7 +33,7 @@ class VerifyUsers extends Component {
 
         let users_content = users.map(user => {
             const {id,firstName,lastName,emailVerified,email,attributes} = user;
-            const verify = attributes.approved ? attributes.approved[0] : null;
+            const verify = attributes && attributes.approved ? attributes.approved[0] : null;
             const emails_count = verify ? attributes.approved.length : 0;
             const popup = emails_count > 1 ? <Popup on='hover' position='top right' trigger={
                 <Label><Icon name='mail' />{emails_count}</Label>
