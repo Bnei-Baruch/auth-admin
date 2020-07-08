@@ -27,6 +27,13 @@ class SearchUsers extends Component {
         });
     };
 
+    cleanUsers = () => {
+        getAuthData(`${AUTH_API}/cleanup`, (response) => {
+            console.log(response);
+            alert("Done");
+        });
+    };
+
     selectUser = (user) => {
         this.setState({selected_user: user});
     }
@@ -71,6 +78,7 @@ class SearchUsers extends Component {
                         <Menu.Item>
                         </Menu.Item>
                         <Menu.Item>
+                            <Button color='red' onClick={this.cleanUsers}>CleanUsers</Button>
                         </Menu.Item>
                     </Menu.Menu>
                 </Menu>
