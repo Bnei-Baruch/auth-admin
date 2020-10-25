@@ -3,7 +3,7 @@ import Keycloak from 'keycloak-js';
 const userManagerConfig = {
     url: 'https://accounts.kbb1.com/auth',
     realm: 'main',
-    clientId: 'galaxy',
+    clientId: 'auth-admin',
     scope: 'profile',
     enableLogging: true,
 };

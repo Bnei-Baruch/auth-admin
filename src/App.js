@@ -14,13 +14,15 @@ class App extends Component {
 
   state = {
     user: null,
-    gxy_root: false,
+    auth_admin: false,
+    auth_root: false,
   };
 
   checkPermission = (user) => {
-    const gxy_root = kc.hasRealmRole("gxy_root");
-    if(gxy_root) {
-      this.setState({user, gxy_root});
+    const auth_admin = kc.hasRealmRole("auth_admin");
+    const auth_root = kc.hasRealmRole("auth_root");
+    if(auth_root || auth_admin) {
+      this.setState({user, auth_admin, auth_root});
     } else {
       alert("Access denied!");
       kc.logout();
@@ -29,20 +31,20 @@ class App extends Component {
 
   render() {
 
-    const {gxy_root,user} = this.state;
+    const {auth_admin,user} = this.state;
 
     let login = (<LoginPage user={user} checkPermission={this.checkPermission} />);
 
     const panes = [
       { menuItem: { key: 'Home', icon: 'home', content: 'Home', disabled: false },
         render: () => <Tab.Pane attached={true} >{login}</Tab.Pane> },
-      { menuItem: { key: 'users', icon: 'id badge', content: 'Users', disabled: !gxy_root },
+      { menuItem: { key: 'users', icon: 'id badge', content: 'Users', disabled: !auth_admin },
         render: () => <Tab.Pane attached={false} ><SearchUsers user={user} /></Tab.Pane> },
       { menuItem: { key: 'new', icon: 'user plus', content: 'New', disabled: !gxy_root },
         render: () => <Tab.Pane attached={false} ><NewUsers user={user} /></Tab.Pane> },
-      { menuItem: { key: 'pending', icon: 'tasks', content: 'Pending', disabled: !gxy_root },
+      { menuItem: { key: 'pending', icon: 'tasks', content: 'Pending', disabled: !auth_admin },
         render: () => <Tab.Pane attached={false} ><PendingUsers user={user} /></Tab.Pane> },
-      { menuItem: { key: 'verify', icon: 'registered', content: 'Verify', disabled: !gxy_root },
+      { menuItem: { key: 'verify', icon: 'registered', content: 'Verify', disabled: !auth_admin },
         render: () => <Tab.Pane attached={false} ><VerifyUsers user={user} /></Tab.Pane> },
     ];
 
