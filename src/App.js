@@ -40,7 +40,7 @@ class App extends Component {
         render: () => <Tab.Pane attached={true} >{login}</Tab.Pane> },
       { menuItem: { key: 'users', icon: 'id badge', content: 'Users', disabled: !auth_admin },
         render: () => <Tab.Pane attached={false} ><SearchUsers user={user} /></Tab.Pane> },
-      { menuItem: { key: 'new', icon: 'user plus', content: 'New', disabled: !gxy_root },
+      { menuItem: { key: 'new', icon: 'user plus', content: 'New', disabled: !auth_admin },
         render: () => <Tab.Pane attached={false} ><NewUsers user={user} /></Tab.Pane> },
       { menuItem: { key: 'pending', icon: 'tasks', content: 'Pending', disabled: !auth_admin },
         render: () => <Tab.Pane attached={false} ><PendingUsers user={user} /></Tab.Pane> },
