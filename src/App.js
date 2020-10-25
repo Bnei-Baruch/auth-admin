@@ -7,6 +7,7 @@ import {kc} from "./components/UserManager";
 import PendingUsers from "./components/PendingUsers";
 import VerifyUsers from "./components/VerifyUsers";
 import SearchUsers from "./components/SearchUsers";
+import NewUsers from "./components/NewUsers";
 
 
 class App extends Component {
@@ -37,6 +38,8 @@ class App extends Component {
         render: () => <Tab.Pane attached={true} >{login}</Tab.Pane> },
       { menuItem: { key: 'users', icon: 'id badge', content: 'Users', disabled: !gxy_root },
         render: () => <Tab.Pane attached={false} ><SearchUsers user={user} /></Tab.Pane> },
+      { menuItem: { key: 'new', icon: 'user plus', content: 'New', disabled: !gxy_root },
+        render: () => <Tab.Pane attached={false} ><NewUsers user={user} /></Tab.Pane> },
       { menuItem: { key: 'pending', icon: 'tasks', content: 'Pending', disabled: !gxy_root },
         render: () => <Tab.Pane attached={false} ><PendingUsers user={user} /></Tab.Pane> },
       { menuItem: { key: 'verify', icon: 'registered', content: 'Verify', disabled: !gxy_root },
