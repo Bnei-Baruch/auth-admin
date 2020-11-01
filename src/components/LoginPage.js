@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import {kc,getUser} from './UserManager';
 import {Container,Message,Button,Dropdown,Image} from 'semantic-ui-react';
 import logo from './logo.png';
+import {KC_URL} from "../shared/env";
 
 class LoginPage extends Component {
 
@@ -40,7 +41,7 @@ class LoginPage extends Component {
             <Dropdown inline text=''>
                 <Dropdown.Menu>
                     <Dropdown.Item content='Profile:' disabled />
-                    <Dropdown.Item text='My Account' onClick={() => window.open("https://accounts.kbb1.com/auth/realms/main/account", "_blank")} />
+                    <Dropdown.Item text='My Account' onClick={() => window.open(`${KC_URL}/realms/main/account`, "_blank")} />
                     <Dropdown.Item text='Sign Out' onClick={() => kc.logout()} />
                 </Dropdown.Menu>
             </Dropdown>);
