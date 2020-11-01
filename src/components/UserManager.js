@@ -1,7 +1,8 @@
 import Keycloak from 'keycloak-js';
+import {KC_URL} from "../shared/env";
 
 const userManagerConfig = {
-    url: 'https://accounts.kbb1.com/auth',
+    url: `${KC_URL}`,
     realm: 'main',
     clientId: 'auth-admin',
     scope: 'profile',
