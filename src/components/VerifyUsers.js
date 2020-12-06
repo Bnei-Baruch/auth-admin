@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import {Container, Segment, Table, Icon, Menu, Popup, Label, Divider} from "semantic-ui-react";
 import {getAuthData} from "../shared/tools";
-import {AUTH_API, IGNORED_ID, VERIFY_ID} from "../shared/env";
+import {AUTH_API, GUESTS_ID, IGNORED_ID, VERIFY_ID} from "../shared/env";
 
 class VerifyUsers extends Component {
 
@@ -15,12 +15,12 @@ class VerifyUsers extends Component {
     };
 
     componentDidMount() {
-        getAuthData(`${AUTH_API}/users/${VERIFY_ID}`, (users) => {
+        getAuthData(`${AUTH_API}/users/${GUESTS_ID}`, (users) => {
             this.setState({users, loading: false});
         });
-        getAuthData(`${AUTH_API}/users/${IGNORED_ID}`, (ignored_users) => {
-            this.setState({ignored_users});
-        });
+        // getAuthData(`${AUTH_API}/users/${IGNORED_ID}`, (ignored_users) => {
+        //     this.setState({ignored_users});
+        // });
     };
 
     selectUser = (user) => {
@@ -105,18 +105,18 @@ class VerifyUsers extends Component {
                         </Table.Body>
                     </Table>
                     <Divider />
-                    <Table selectable compact='very' basic structured className="admin_table" unstackable>
-                        <Table.Body>
-                            <Table.Row disabled>
-                                <Table.Cell width={3}>Email</Table.Cell>
-                                <Table.Cell width={2}>First Name</Table.Cell>
-                                <Table.Cell width={2}>Last Name</Table.Cell>
-                                <Table.Cell width={3}>Verify</Table.Cell>
-                                <Table.Cell width={1}>Count</Table.Cell>
-                            </Table.Row>
-                            {users_content}
-                        </Table.Body>
-                    </Table>
+                    {/*<Table selectable compact='very' basic structured className="admin_table" unstackable>*/}
+                    {/*    <Table.Body>*/}
+                    {/*        <Table.Row disabled>*/}
+                    {/*            <Table.Cell width={3}>Email</Table.Cell>*/}
+                    {/*            <Table.Cell width={2}>First Name</Table.Cell>*/}
+                    {/*            <Table.Cell width={2}>Last Name</Table.Cell>*/}
+                    {/*            <Table.Cell width={3}>Verify</Table.Cell>*/}
+                    {/*            <Table.Cell width={1}>Count</Table.Cell>*/}
+                    {/*        </Table.Row>*/}
+                    {/*        {users_content}*/}
+                    {/*    </Table.Body>*/}
+                    {/*</Table>*/}
                 </Segment>
             </Container>
         );
