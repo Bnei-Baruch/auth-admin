@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {Container, Segment, Table, Icon, Menu, Input, Button} from "semantic-ui-react";
+import {Container, Segment, Table, Icon, Menu, Input, Button, Select} from "semantic-ui-react";
 import {getAuthData} from "../shared/tools";
 import {AUTH_API} from "../shared/env";
 
@@ -8,8 +8,7 @@ class SearchUsers extends Component {
     state = {
         users: [],
         selected_user: "",
-        search_id: "",
-        search_mail: "",
+        search: "id",
         disabled: true,
         loading: true,
         input: "",
@@ -18,14 +17,12 @@ class SearchUsers extends Component {
     componentDidMount() {
     };
 
-    searchUser = (arg) => {
-        const {search_id, search_mail, users} = this.state;
-        const value = arg === "id" ? search_id : search_mail;
-        console.log(value);
-        getAuthData(`${AUTH_API}/search?${arg}=${value}`, (response) => {
+    searchUser = () => {
+        const {search, input, users} = this.state;
+        getAuthData(`${AUTH_API}/search?${search}=${input}`, (response) => {
             users.push(response)
             console.log(response)
-            this.setState({search_id: "", search_mail: ""});
+            this.setState({input: ""});
         });
     };
 
@@ -41,7 +38,7 @@ class SearchUsers extends Component {
     }
 
     render() {
-        const {users, selected_user, search_id, search_mail} = this.state;
+        const {users, selected_user, search, input} = this.state;
 
         let users_content = users.map(user => {
             const {id,firstName,lastName,emailVerified,email,createdTimestamp,social} = user;
@@ -61,32 +58,25 @@ class SearchUsers extends Component {
             )
         })
 
+        const options = [
+            { key: 'email', text: 'MAIL', value: 'email' },
+            { key: 'id', text: 'ID', value: 'id' },
+        ]
+
         return (
             <Container fluid >
                 <Menu size='large' secondary>
                     <Menu.Item>
                     </Menu.Item>
                     <Menu.Menu position='left'>
-                        <Menu.Item>
-                            <Input
-                                error={!search_id}
-                                value={search_id}
-                                placeholder='Search user by ID...'
-                                onChange={(e, { value }) => this.setState({search_id: value})} />
-                        </Menu.Item>
-                        <Menu.Item>
-                            <Button color='blue' disabled={!search_id} onClick={() => this.searchUser("id")}>Search</Button>
-                        </Menu.Item>
-                        <Menu.Item>
-                            <Input
-                                error={!search_mail}
-                                value={search_mail}
-                                placeholder='Search user by MAIL...'
-                                onChange={(e, { value }) => this.setState({search_mail: value})} />
-                        </Menu.Item>
-                        <Menu.Item>
-                            <Button color='blue' disabled={!search_mail} onClick={() => this.searchUser("email")}>Search</Button>
-                        </Menu.Item>
+                        <Input type='text' placeholder='Search..' action value={input}
+                               onChange={(e, { value }) => this.setState({input: value})}>
+                            <input />
+                            <Select compact options={options} value={search}
+                                    onChange={(e, { value }) => this.setState({search: value})}/>
+                            <Button type='submit' color='blue' disabled={!search}
+                                    onClick={() => this.searchUser(search)}>Search</Button>
+                        </Input>
                     </Menu.Menu>
                     {/*<Menu.Menu position='right'>*/}
                     {/*    <Menu.Item>*/}
