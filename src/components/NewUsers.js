@@ -16,7 +16,7 @@ class NewUsers extends Component {
     };
 
     componentDidMount() {
-        getAuthData(`${AUTH_API}/users/${NEWUSERS_ID}`, (users) => {
+        getAuthData(`${AUTH_API}/users/${NEWUSERS_ID}?first=0&max=10000`, (users) => {
 
             users.sort((a, b) => {
                 if (a.createdTimestamp < b.createdTimestamp) return 1;

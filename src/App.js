@@ -7,6 +7,7 @@ import {kc} from "./components/UserManager";
 import PendingUsers from "./components/PendingUsers";
 import VerifyUsers from "./components/VerifyUsers";
 import SearchUsers from "./components/SearchUsers";
+import FindUser from "./components/FindUser";
 import NewUsers from "./components/NewUsers";
 
 
@@ -38,6 +39,8 @@ class App extends Component {
     const panes = [
       { menuItem: { key: 'Home', icon: 'home', content: 'Home', disabled: false },
         render: () => <Tab.Pane attached={true} >{login}</Tab.Pane> },
+      { menuItem: { key: 'find', icon: 'find', content: 'Find', disabled: !auth_admin },
+        render: () => <Tab.Pane attached={false} ><FindUser user={user} /></Tab.Pane> },
       { menuItem: { key: 'users', icon: 'search', content: 'Search', disabled: !auth_admin },
         render: () => <Tab.Pane attached={false} ><SearchUsers user={user} /></Tab.Pane> },
       { menuItem: { key: 'new', icon: 'user plus', content: 'New', disabled: !auth_admin },
