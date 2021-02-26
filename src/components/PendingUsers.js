@@ -16,7 +16,7 @@ class PendingUsers extends Component {
     };
 
     componentDidMount() {
-        getAuthData(`${AUTH_API}/users/${PENDING_ID}`, (users) => {
+        getAuthData(`${AUTH_API}/users/${PENDING_ID}?first=0&max=10000`, (users) => {
             let pending_users = [];
             let request_users = [];
 

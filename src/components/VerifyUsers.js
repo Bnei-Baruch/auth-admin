@@ -15,7 +15,7 @@ class VerifyUsers extends Component {
     };
 
     componentDidMount() {
-        getAuthData(`${AUTH_API}/users/${GUESTS_ID}`, (users) => {
+        getAuthData(`${AUTH_API}/users/${GUESTS_ID}?first=0&max=10000`, (users) => {
             this.setState({users, loading: false});
         });
         // getAuthData(`${AUTH_API}/users/${IGNORED_ID}`, (ignored_users) => {
