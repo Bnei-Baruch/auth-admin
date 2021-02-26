@@ -54,7 +54,7 @@ class VerifyUsers extends Component {
             )
         })
 
-        let users_ignored = ignored_users.map(user => {
+        let users_ignored = users.map(user => {
             const {id,firstName,lastName,email,createdTimestamp,attributes} = user;
             const request = attributes && attributes.request !== undefined;
             const req_user = request ? attributes.request[0] : "";
@@ -68,7 +68,7 @@ class VerifyUsers extends Component {
                     <Table.Cell>{firstName}</Table.Cell>
                     <Table.Cell>{lastName}</Table.Cell>
                     <Table.Cell>{reg_time}</Table.Cell>
-                    <Table.Cell><b>{req_user}</b></Table.Cell>
+                    {/*<Table.Cell><b>{req_user}</b></Table.Cell>*/}
                 </Table.Row>
             )
         })
@@ -99,7 +99,7 @@ class VerifyUsers extends Component {
                                 <Table.Cell width={2}>First Name</Table.Cell>
                                 <Table.Cell width={2}>Last Name</Table.Cell>
                                 <Table.Cell width={3}>Reg Time</Table.Cell>
-                                <Table.Cell width={2}>Ignored by</Table.Cell>
+                                {/*<Table.Cell width={2}>Ignored by</Table.Cell>*/}
                             </Table.Row>
                             {users_ignored}
                         </Table.Body>
