@@ -32,7 +32,7 @@ class SearchUsers extends Component {
 
     searchUser = () => {
         const {input} = this.state;
-        getAuthData(`${AUTH_API}/search?search=${input}`, (users) => {
+        getAuthData(`${AUTH_API}/search?search=${input}&max=100`, (users) => {
             users.sort((a, b) => {
                 if (a.createdTimestamp < b.createdTimestamp) return 1;
                 if (a.createdTimestamp > b.createdTimestamp) return -1;
