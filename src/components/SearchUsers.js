@@ -118,17 +118,13 @@ class SearchUsers extends Component {
     render() {
         const {users,selected_user,loading,search,input,user_info} = this.state;
         const {groups,roles,social} = user_info;
+
+        let v = (<Icon color='green' name='checkmark'/>);
+        let x = (<Icon color='red' name='close'/>);
+
         const gxy_user = !!roles?.find(r => r.name === "gxy_user")
-        const idp = social?.length ? social[0].identityProvider : ""
+        const idp = social?.length ? social[0].identityProvider : x
         const grp = groups?.length ? groups[0].name : ""
-
-        let v = (<Icon name='checkmark'/>);
-        let x = (<Icon name='close'/>);
-
-        let users_list = users.map((data, i) => {
-            const { id, email } = data;
-            return ({ key: i, text: email, value: id });
-        });
 
         let users_content = users.map(user => {
             const {id,firstName,lastName,emailVerified,email,createdTimestamp} = user;
@@ -142,20 +138,18 @@ class SearchUsers extends Component {
                     <Table.Cell>{lastName}</Table.Cell>
                     <Table.Cell>{reg_time}</Table.Cell>
                 </Table.Row>} flowing hoverable on='click'>
-                <Grid centered divided columns={3}>
-                    <Grid.Column textAlign='center'>
-                        <Header as='h4'>IDP</Header>
-                        <p><b>{idp}</b></p>
-                    </Grid.Column>
-                    <Grid.Column textAlign='center'>
-                        <Header as='h4'>SG</Header>
-                        <p><b>{grp}</b></p>
-                    </Grid.Column>
-                    <Grid.Column textAlign='center'>
-                        <Header as='h4'>Gxy User</Header>
-                        <p><b>{gxy_user ? v : x}</b></p>
-                    </Grid.Column>
-                </Grid>
+                <Table compact='very' structured unstackable singleLine celled>
+                    <Table.Row disabled>
+                        <Table.HeaderCell width={3}>Social Id</Table.HeaderCell>
+                        <Table.HeaderCell width={2}>Sec Group</Table.HeaderCell>
+                        <Table.HeaderCell width={2}>Gxy User</Table.HeaderCell>
+                    </Table.Row>
+                    <Table.Row>
+                        <Table.Cell textAlign='center'>{idp}</Table.Cell>
+                        <Table.Cell textAlign='center'>{grp}</Table.Cell>
+                        <Table.Cell textAlign='center'>{gxy_user ? v : x}</Table.Cell>
+                    </Table.Row>
+                </Table>
             </Popup>
             )
         });
