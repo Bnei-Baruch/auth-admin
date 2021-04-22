@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {Button, Container, Segment, Select, Table, Icon, Menu, Input} from "semantic-ui-react";
+import {Button, Container, Segment, Popup, Table, Icon, Menu, Input, Grid, Header} from "semantic-ui-react";
 import {getAuthData} from "../shared/tools";
 import {AUTH_API, NEWUSERS_ID} from "../shared/env";
 
@@ -15,6 +15,7 @@ class SearchUsers extends Component {
         input: "",
         first: 0,
         max: 15,
+        user_info: {}
     };
 
     componentDidMount() {
@@ -72,11 +73,11 @@ class SearchUsers extends Component {
         });
     }
 
-    selectUser = (id, user) => {
-        console.log(user)
-        if(user.emailVerified) {
-            this.setState({selected_user: id});
-        }
+    selectUser = (id) => {
+        getAuthData(`${AUTH_API}/user/${id}`, (user_info) => {
+            this.setState({selected_user: id, user_info});
+            console.log(user_info)
+        });
     }
 
     approveUser = () => {
@@ -115,7 +116,14 @@ class SearchUsers extends Component {
     }
 
     render() {
-        const {users,selected_user,loading,search,input} = this.state;
+        const {users,selected_user,loading,search,input,user_info} = this.state;
+        const {groups,roles,social} = user_info;
+        const gxy_user = !!roles?.find(r => r.name === "gxy_user")
+        const idp = social?.length ? social[0].identityProvider : ""
+        const grp = groups?.length ? groups[0].name : ""
+
+        let v = (<Icon name='checkmark'/>);
+        let x = (<Icon name='close'/>);
 
         let users_list = users.map((data, i) => {
             const { id, email } = data;
@@ -125,16 +133,30 @@ class SearchUsers extends Component {
         let users_content = users.map(user => {
             const {id,firstName,lastName,emailVerified,email,createdTimestamp} = user;
             const reg_time = new Date(createdTimestamp).toUTCString();
-            return (
-                <Table.Row key={id}
-                           active={id === selected_user}
-                           negative={!emailVerified}
-                           onClick={() => this.selectUser(id, user)} >
+            return (<Popup trigger={<Table.Row key={id}
+                                               active={id === selected_user}
+                                               negative={!emailVerified}
+                                               onClick={() => this.selectUser(id, user)} >
                     <Table.Cell>{<Icon name={emailVerified ? 'checkmark' : 'close'} />} - {email}</Table.Cell>
                     <Table.Cell>{firstName}</Table.Cell>
                     <Table.Cell>{lastName}</Table.Cell>
                     <Table.Cell>{reg_time}</Table.Cell>
-                </Table.Row>
+                </Table.Row>} flowing hoverable on='click'>
+                <Grid centered divided columns={3}>
+                    <Grid.Column textAlign='center'>
+                        <Header as='h4'>IDP</Header>
+                        <p><b>{idp}</b></p>
+                    </Grid.Column>
+                    <Grid.Column textAlign='center'>
+                        <Header as='h4'>SG</Header>
+                        <p><b>{grp}</b></p>
+                    </Grid.Column>
+                    <Grid.Column textAlign='center'>
+                        <Header as='h4'>Gxy User</Header>
+                        <p><b>{gxy_user ? v : x}</b></p>
+                    </Grid.Column>
+                </Grid>
+            </Popup>
             )
         });
 
