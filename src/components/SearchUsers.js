@@ -139,14 +139,20 @@ class SearchUsers extends Component {
                     <Table.Cell>{reg_time}</Table.Cell>
                 </Table.Row>} flowing hoverable on='click'>
                 <Table compact='very' structured unstackable singleLine celled>
-                    <Table.Row disabled>
-                        <Table.HeaderCell width={3}>Social Id</Table.HeaderCell>
-                        <Table.HeaderCell width={2}>Sec Group</Table.HeaderCell>
-                        <Table.HeaderCell width={2}>Gxy User</Table.HeaderCell>
+                    <Table.Row>
+                        <Table.Cell width={3}>User ID</Table.Cell>
+                        <Table.Cell textAlign='center'>{id}</Table.Cell>
                     </Table.Row>
                     <Table.Row>
+                        <Table.Cell width={3}>Social ID</Table.Cell>
                         <Table.Cell textAlign='center'>{idp}</Table.Cell>
+                    </Table.Row>
+                    <Table.Row>
+                        <Table.Cell width={2}>Sec Group</Table.Cell>
                         <Table.Cell textAlign='center'>{grp}</Table.Cell>
+                    </Table.Row>
+                    <Table.Row>
+                        <Table.Cell width={2}>Gxy User</Table.Cell>
                         <Table.Cell textAlign='center'>{gxy_user ? v : x}</Table.Cell>
                     </Table.Row>
                 </Table>
