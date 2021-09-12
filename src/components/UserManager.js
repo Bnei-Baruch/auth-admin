@@ -3,61 +3,60 @@ import {KC_URL} from "../shared/env";
 
 const userManagerConfig = {
     url: `${KC_URL}`,
-    realm: 'main',
-    clientId: 'auth-admin',
-    scope: 'profile',
+    realm: "main",
+    clientId: "auth-admin",
+};
+
+const initOptions = {
+    onLoad: "check-sso",
+    checkLoginIframe: false,
+    flow: "standard",
+    pkceMethod: "S256",
     enableLogging: true,
 };
 
 export const kc = new Keycloak(userManagerConfig);
 
 kc.onTokenExpired = () => {
-    console.debug(" -- Renew token -- ");
     renewToken(0);
 };
 
 kc.onAuthLogout = () => {
-    console.debug("-- Detect clearToken --");
     kc.logout();
-}
+};
 
 const renewToken = (retry) => {
-    kc.updateToken(70)
+    retry++;
+    kc.updateToken(5)
         .then(refreshed => {
-            if(refreshed) {
-                console.debug("-- Refreshed --");
-            } else {
-                console.warn('Token is still valid?..');
+            if (refreshed) {
+                console.debug(refreshed)
             }
         })
-        .catch(err => {
-            retry++;
-            if(retry > 5) {
-                console.error("Refresh retry: failed");
-                console.debug("-- Refresh Failed --");
+        .catch(() => {
+            if (retry > 10) {
                 kc.clearToken();
             } else {
                 setTimeout(() => {
-                    console.error("Refresh retry: " + retry);
                     renewToken(retry);
                 }, 10000);
             }
         });
-}
+};
 
-
+const setData = () => {
+    const {realm_access: {roles}, sub, given_name, name, email} = kc.tokenParsed;
+    let user = {id: sub, display: name, username: given_name, name, email, roles};
+    return user;
+};
 
 export const getUser = (callback) => {
-    kc.init({onLoad: 'check-sso', checkLoginIframe: false, flow: 'standard', pkceMethod: 'S256'})
+    kc.init(initOptions)
         .then(authenticated => {
-            if(authenticated) {
-                const {realm_access: {roles},sub,given_name,name,email} = kc.tokenParsed;
-                let user = {id: sub, title: given_name, username: given_name, name, email, roles};
-                callback(user)
-            } else {
-                callback(null)
-            }
-        }).catch((err) => console.log(err));
+            const user = authenticated ? setData() : null;
+            callback(user);
+        })
+        .catch(err => console.error(err));
 };
 
 export default kc;
