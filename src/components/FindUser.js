@@ -50,21 +50,21 @@ class FindUser extends Component {
         let x = (<Icon color='red' name='close'/>);
 
         const gxy_user = !!roles?.find(r => r.name === "gxy_user")
-        const idp = social?.length ? social[0].identityProvider : x
+        //const idp = social?.length ? social[0].identityProvider : x
+        const idp = social?.length ? social.map(s => s.identityProvider + ' | ') : x
         const grp = groups?.length ? groups[0].name : ""
 
         let users_content = users.map(user => {
             const {id,firstName,lastName,emailVerified,email,createdTimestamp} = user;
             const reg_time = new Date(createdTimestamp).toUTCString();
-            return (<Popup trigger={<Table.Row key={id}
-                                               active={id === selected_user}
-                                               negative={!emailVerified}
-                                               onClick={() => this.selectUser(id, user)} >
-                    <Table.Cell>{<Icon name={emailVerified ? 'checkmark' : 'close'} />} - {email}</Table.Cell>
-                    <Table.Cell>{firstName}</Table.Cell>
-                    <Table.Cell>{lastName}</Table.Cell>
-                    <Table.Cell>{reg_time}</Table.Cell>
-                </Table.Row>} flowing hoverable on='click'>
+            return (<Popup trigger={
+                    <Table.Row key={id} active={id === selected_user} negative={!emailVerified} onClick={() => this.selectUser(id, user)} >
+                        <Table.Cell>{<Icon name={emailVerified ? 'checkmark' : 'close'} />} - {email}</Table.Cell>
+                        <Table.Cell>{firstName}</Table.Cell>
+                        <Table.Cell>{lastName}</Table.Cell>
+                        <Table.Cell>{reg_time}</Table.Cell>
+                    </Table.Row>
+                } flowing hoverable on='click'>
                     <Table compact='very' structured unstackable singleLine celled>
                         <Table.Row disabled>
                             <Table.HeaderCell width={3}>Social Id</Table.HeaderCell>
