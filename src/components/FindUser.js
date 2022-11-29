@@ -8,7 +8,7 @@ class FindUser extends Component {
     state = {
         users: [],
         selected_user: "",
-        search: "id",
+        search: "email",
         disabled: true,
         loading: true,
         input: "",
