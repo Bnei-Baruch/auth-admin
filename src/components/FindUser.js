@@ -44,13 +44,14 @@ class FindUser extends Component {
     render() {
         const {users, selected_user, search, input, user_info} = this.state;
 
-        const {groups,roles,social} = user_info;
+        const {groups,roles,social,credentials} = user_info;
 
         let v = (<Icon color='green' name='checkmark'/>);
         let x = (<Icon color='red' name='close'/>);
 
         const gxy_user = !!roles?.find(r => r.name === "gxy_user")
         //const idp = social?.length ? social[0].identityProvider : x
+        const crd = credentials?.length ? credentials[0].type : x
         const idp = social?.length ? social.map(s => s.identityProvider + ' | ') : x
         const grp = groups?.length ? groups[0].name : ""
 
@@ -70,11 +71,13 @@ class FindUser extends Component {
                             <Table.HeaderCell width={3}>Social Id</Table.HeaderCell>
                             <Table.HeaderCell width={2}>Sec Group</Table.HeaderCell>
                             <Table.HeaderCell width={2}>Gxy User</Table.HeaderCell>
+                            <Table.HeaderCell width={2}>Credentials</Table.HeaderCell>
                         </Table.Row>
                         <Table.Row>
                             <Table.Cell textAlign='center'>{idp}</Table.Cell>
                             <Table.Cell textAlign='center'>{grp}</Table.Cell>
                             <Table.Cell textAlign='center'>{gxy_user ? v : x}</Table.Cell>
+                            <Table.Cell textAlign='center'>{crd}</Table.Cell>
                         </Table.Row>
                     </Table>
                 </Popup>

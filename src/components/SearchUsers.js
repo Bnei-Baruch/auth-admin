@@ -117,12 +117,13 @@ class SearchUsers extends Component {
 
     render() {
         const {users,selected_user,loading,search,input,user_info} = this.state;
-        const {groups,roles,social} = user_info;
+        const {groups,roles,social,credentials} = user_info;
 
         let v = (<Icon color='green' name='checkmark'/>);
         let x = (<Icon color='red' name='close'/>);
 
         const gxy_user = !!roles?.find(r => r.name === "gxy_user")
+        const crd = credentials?.length ? credentials[0].type : x
         const idp = social?.length ? social[0].identityProvider : x
         const grp = groups?.length ? groups[0].name : ""
 
@@ -154,6 +155,10 @@ class SearchUsers extends Component {
                     <Table.Row>
                         <Table.Cell width={2}>Gxy User</Table.Cell>
                         <Table.Cell textAlign='center'>{gxy_user ? v : x}</Table.Cell>
+                    </Table.Row>
+                    <Table.Row>
+                        <Table.Cell width={2}>Credentials</Table.Cell>
+                        <Table.Cell textAlign='center'>{crd}</Table.Cell>
                     </Table.Row>
                 </Table>
             </Popup>
