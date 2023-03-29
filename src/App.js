@@ -9,6 +9,7 @@ import VerifyUsers from "./components/VerifyUsers";
 import SearchUsers from "./components/SearchUsers";
 import FindUser from "./components/FindUser";
 import NewUsers from "./components/NewUsers";
+import LoginUsers from "./components/LoginUsers";
 
 
 class App extends Component {
@@ -39,6 +40,8 @@ class App extends Component {
     const panes = [
       { menuItem: { key: 'Home', icon: 'home', content: 'Home', disabled: false },
         render: () => <Tab.Pane attached={true} >{login}</Tab.Pane> },
+      { menuItem: { key: 'login', icon: 'chain', content: 'Login', disabled: !auth_admin },
+        render: () => <Tab.Pane attached={false} ><LoginUsers user={user} /></Tab.Pane> },
       { menuItem: { key: 'find', icon: 'find', content: 'Find', disabled: !auth_admin },
         render: () => <Tab.Pane attached={false} ><FindUser user={user} /></Tab.Pane> },
       { menuItem: { key: 'users', icon: 'search', content: 'Search', disabled: !auth_admin },
