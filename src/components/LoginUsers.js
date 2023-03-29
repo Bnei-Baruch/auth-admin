@@ -141,14 +141,17 @@ class LoginUsers extends Component {
 
         const buttons = Object.keys(CLIENTS).map(k => {
             return (
-                <Button onClick={() => this.setClient(k)} selected={selected_client === k} >{CLIENTS[k].name}
-                    <Label color='grey'>{counts[k].count}</Label>
-                </Button>
+                <Button basic content={CLIENTS[k].name}
+                        color={selected_client === k ? 'pink' : 'blue'}
+                        onClick={() => this.setClient(k)}
+                        icon={CLIENTS[k].icon}
+                        label={{ as: 'a', basic: true, color: 'blue', content: counts[k].count}} />
+
             )
         })
 
         let users_content = users.map(user => {
-            const {user_id,email,time} = user;
+            const {user_id,email,time,logins} = user;
             const login_time = new Date(time).toUTCString();
             return (<Popup trigger={<Table.Row key={user_id}
                                                active={user_id === selected_user}
@@ -156,7 +159,9 @@ class LoginUsers extends Component {
                     <Table.Cell>{email}</Table.Cell>
                     <Table.Cell>{user_id}</Table.Cell>
                     <Table.Cell>{login_time}</Table.Cell>
-                    <Table.Cell></Table.Cell>
+                    {Object.keys(CLIENTS).map(k => {
+                        const st = logins[k] ? v : x
+                        return (<Table.Cell width={1}>{st}</Table.Cell>)})}
                 </Table.Row>} flowing hoverable on='click'>
                 <Table compact='very' structured unstackable singleLine celled>
                     <Table.Row>
@@ -193,20 +198,19 @@ class LoginUsers extends Component {
         });
 
         return (
-            <Container fluid >
-                <Menu size='large' secondary>
-                    <Button.Group>
-                        {buttons}
-                    </Button.Group>
-                </Menu>
+            <Container fluid>
+                <Button.Group attached='top'>
+                    {buttons}
+                </Button.Group>
                 <Segment attached textAlign='center' className="group_list" raised loading={loading} >
                     <Table selectable compact='very' basic structured className="admin_table" unstackable>
                         <Table.Body>
                             <Table.Row disabled>
                                 <Table.Cell width={2}>Email</Table.Cell>
-                                <Table.Cell width={3}>User ID</Table.Cell>
-                                <Table.Cell width={2}>Last Login</Table.Cell>
-                                <Table.Cell width={1}></Table.Cell>
+                                <Table.Cell width={5}>User ID</Table.Cell>
+                                <Table.Cell width={4}>Last Login</Table.Cell>
+                                {Object.keys(CLIENTS).map(k => {
+                                    return (<Table.Cell width={1}><Icon name={CLIENTS[k].icon} /></Table.Cell>)})}
                             </Table.Row>
                             {users_content}
                         </Table.Body>

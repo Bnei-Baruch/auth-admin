@@ -8,9 +8,9 @@ export const NEWUSERS_ID = "85092f0c-19f7-4963-8a27-adf2fae47dc0";
 export const GUESTS_ID = "e1617f1a-ab58-4981-b087-9b997726b821";
 
 export const CLIENTS = {
-    "galaxy": {name: "Arvut ", count: 0},
-    "wf-admin": {name: "WorkFlow ", count: 0},
-    "membership_pay": {name: "Payment ", count: 0},
-    "kmedia-public": {name: "KM Desktop ", count: 0},
-    "kmedia-mobile": {name: "KM Mobile ", count: 0},
+    "galaxy": {name: "Arvut", count: 0, icon: "users"},
+    "wf-admin": {name: "WorkFlow", count: 0, icon: "cogs"},
+    "membership_pay": {name: "Payment", count: 0, icon: "credit card outline"},
+    "kmedia-public": {name: "KM Desktop", count: 0, icon: "boxes"},
+    "kmedia-mobile": {name: "KM Mobile", count: 0, icon: "mobile"},
 }
