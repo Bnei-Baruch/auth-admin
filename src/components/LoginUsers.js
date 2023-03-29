@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import {Button, Container, Segment, Popup, Table, Icon, Menu, Input, Grid, Header} from "semantic-ui-react";
+import {Button, Container, Segment, Popup, Table, Icon, Menu, Input, Label, Header} from "semantic-ui-react";
 import {getAuthData} from "../shared/tools";
-import {AUTH_API, LOGIN_API, NEWUSERS_ID} from "../shared/env";
+import {AUTH_API, LOGIN_API, NEWUSERS_ID, CLIENTS} from "../shared/env";
 
 class LoginUsers extends Component {
 
@@ -10,25 +10,27 @@ class LoginUsers extends Component {
         pending_users: [],
         request_users: [],
         selected_user: "",
+        selected_client: "",
         disabled: true,
         loading: true,
         input: "",
         first: 0,
         max: 15,
-        user_info: {}
+        user_info: {},
+        counts: CLIENTS
     };
 
     componentDidMount() {
+        const {counts} = this.state;
         getAuthData(`${LOGIN_API}/keycloak/logins`, (users) => {
-
-            users.sort((a, b) => {
-                if (a.createdTimestamp < b.createdTimestamp) return 1;
-                if (a.createdTimestamp > b.createdTimestamp) return -1;
-                return 0;
-            });
-
             this.setState({users, loading: false});
         });
+        Object.keys(CLIENTS).map(k => {
+            getAuthData(`${LOGIN_API}/keycloak/count/${k}`, (data) => {
+                counts[k].count = data.count;
+                this.setState({counts});
+            });
+        })
     };
 
     searchUser = () => {
@@ -58,6 +60,12 @@ class LoginUsers extends Component {
         if(first < 0) first = 0;
         this.getData(first, max);
         this.setState({first});
+    }
+
+    setClient = (k) => {
+        getAuthData(`${LOGIN_API}/keycloak/logins/${k}`, (users) => {
+            this.setState({users, selected_client: k});
+        });
     }
 
     getData = (first, max) => {
@@ -120,7 +128,7 @@ class LoginUsers extends Component {
     }
 
     render() {
-        const {users,selected_user,loading,search,input,user_info} = this.state;
+        const {users, selected_client ,selected_user,loading,search,input,user_info, counts} = this.state;
         const {firstName,lastName,groups,roles,social,credentials} = user_info;
 
         let v = (<Icon color='green' name='checkmark'/>);
@@ -130,6 +138,14 @@ class LoginUsers extends Component {
         const crd = credentials?.length ? credentials[0].type : x
         const idp = social?.length ? social[0].identityProvider : x
         const grp = groups?.length ? groups[0].name : ""
+
+        const buttons = Object.keys(CLIENTS).map(k => {
+            return (
+                <Button onClick={() => this.setClient(k)} selected={selected_client === k} >{CLIENTS[k].name}
+                    <Label color='grey'>{counts[k].count}</Label>
+                </Button>
+            )
+        })
 
         let users_content = users.map(user => {
             const {user_id,email,time} = user;
@@ -178,30 +194,11 @@ class LoginUsers extends Component {
 
         return (
             <Container fluid >
-                {/*<Menu size='large' secondary>*/}
-                {/*    <Menu.Item>*/}
-                {/*        <Input type='text' placeholder='Search..' action value={input}*/}
-                {/*               onChange={(e, { value }) => this.setState({input: value})}>*/}
-                {/*            <input />*/}
-                {/*            <Button type='submit' color='blue' disabled={input === ""}*/}
-                {/*                    onClick={() => this.searchUser(search)}>Search</Button>*/}
-                {/*        </Input>*/}
-                {/*    </Menu.Item>*/}
-                {/*    <Menu.Menu position='left'>*/}
-                {/*        <Menu.Item>*/}
-                {/*        </Menu.Item>*/}
-                {/*        <Menu.Item>*/}
-                {/*        </Menu.Item>*/}
-                {/*    </Menu.Menu>*/}
-                {/*    <Menu.Menu position='right'>*/}
-                {/*        <Menu.Item>*/}
-                {/*            <Button color='green' disabled onClick={this.approveUser}>Approve</Button>*/}
-                {/*        </Menu.Item>*/}
-                {/*        <Menu.Item>*/}
-                {/*            <Button color='red' disabled icon='close' onClick={this.removeUser} />*/}
-                {/*        </Menu.Item>*/}
-                {/*    </Menu.Menu>*/}
-                {/*</Menu>*/}
+                <Menu size='large' secondary>
+                    <Button.Group>
+                        {buttons}
+                    </Button.Group>
+                </Menu>
                 <Segment attached textAlign='center' className="group_list" raised loading={loading} >
                     <Table selectable compact='very' basic structured className="admin_table" unstackable>
                         <Table.Body>
