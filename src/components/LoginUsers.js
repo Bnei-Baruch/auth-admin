@@ -74,9 +74,13 @@ class LoginUsers extends Component {
     }
 
     selectUser = (id) => {
-        getAuthData(`${AUTH_API}/user/${id}`, (user_info) => {
-            this.setState({selected_user: id, user_info});
-            console.log(user_info)
+        const {search, input, users} = this.state;
+        getAuthData(`${AUTH_API}/find?id=${id}`, (response) => {
+            getAuthData(`${AUTH_API}/user/${id}`, (user_info) => {
+                let user = {...response,...user_info}
+                this.setState({selected_user: id, user_info: user});
+                console.log(user)
+            });
         });
     }
 
@@ -117,7 +121,7 @@ class LoginUsers extends Component {
 
     render() {
         const {users,selected_user,loading,search,input,user_info} = this.state;
-        const {groups,roles,social,credentials} = user_info;
+        const {firstName,lastName,groups,roles,social,credentials} = user_info;
 
         let v = (<Icon color='green' name='checkmark'/>);
         let x = (<Icon color='red' name='close'/>);
@@ -139,6 +143,14 @@ class LoginUsers extends Component {
                     <Table.Cell></Table.Cell>
                 </Table.Row>} flowing hoverable on='click'>
                 <Table compact='very' structured unstackable singleLine celled>
+                    <Table.Row>
+                        <Table.Cell width={3}>First Name</Table.Cell>
+                        <Table.Cell textAlign='center'>{firstName}</Table.Cell>
+                    </Table.Row>
+                    <Table.Row>
+                        <Table.Cell width={3}>Last Name</Table.Cell>
+                        <Table.Cell textAlign='center'>{lastName}</Table.Cell>
+                    </Table.Row>
                     <Table.Row>
                         <Table.Cell width={3}>User ID</Table.Cell>
                         <Table.Cell textAlign='center'>{user_id}</Table.Cell>
@@ -166,30 +178,30 @@ class LoginUsers extends Component {
 
         return (
             <Container fluid >
-                <Menu size='large' secondary>
-                    <Menu.Item>
-                        <Input type='text' placeholder='Search..' action value={input}
-                               onChange={(e, { value }) => this.setState({input: value})}>
-                            <input />
-                            <Button type='submit' color='blue' disabled={input === ""}
-                                    onClick={() => this.searchUser(search)}>Search</Button>
-                        </Input>
-                    </Menu.Item>
-                    <Menu.Menu position='left'>
-                        <Menu.Item>
-                        </Menu.Item>
-                        <Menu.Item>
-                        </Menu.Item>
-                    </Menu.Menu>
-                    <Menu.Menu position='right'>
-                        <Menu.Item>
-                            <Button color='green' disabled onClick={this.approveUser}>Approve</Button>
-                        </Menu.Item>
-                        <Menu.Item>
-                            <Button color='red' disabled icon='close' onClick={this.removeUser} />
-                        </Menu.Item>
-                    </Menu.Menu>
-                </Menu>
+                {/*<Menu size='large' secondary>*/}
+                {/*    <Menu.Item>*/}
+                {/*        <Input type='text' placeholder='Search..' action value={input}*/}
+                {/*               onChange={(e, { value }) => this.setState({input: value})}>*/}
+                {/*            <input />*/}
+                {/*            <Button type='submit' color='blue' disabled={input === ""}*/}
+                {/*                    onClick={() => this.searchUser(search)}>Search</Button>*/}
+                {/*        </Input>*/}
+                {/*    </Menu.Item>*/}
+                {/*    <Menu.Menu position='left'>*/}
+                {/*        <Menu.Item>*/}
+                {/*        </Menu.Item>*/}
+                {/*        <Menu.Item>*/}
+                {/*        </Menu.Item>*/}
+                {/*    </Menu.Menu>*/}
+                {/*    <Menu.Menu position='right'>*/}
+                {/*        <Menu.Item>*/}
+                {/*            <Button color='green' disabled onClick={this.approveUser}>Approve</Button>*/}
+                {/*        </Menu.Item>*/}
+                {/*        <Menu.Item>*/}
+                {/*            <Button color='red' disabled icon='close' onClick={this.removeUser} />*/}
+                {/*        </Menu.Item>*/}
+                {/*    </Menu.Menu>*/}
+                {/*</Menu>*/}
                 <Segment attached textAlign='center' className="group_list" raised loading={loading} >
                     <Table selectable compact='very' basic structured className="admin_table" unstackable>
                         <Table.Body>
@@ -203,10 +215,10 @@ class LoginUsers extends Component {
                         </Table.Body>
                     </Table>
                 </Segment>
-                <Button.Group attached='bottom' >
-                    <Button icon onClick={this.getReverce} ><Icon name='angle double left' /></Button>
-                    <Button icon onClick={this.getForward} ><Icon name='angle double right' /></Button>
-                </Button.Group>
+                {/*<Button.Group attached='bottom' >*/}
+                {/*    <Button icon onClick={this.getReverce} ><Icon name='angle double left' /></Button>*/}
+                {/*    <Button icon onClick={this.getForward} ><Icon name='angle double right' /></Button>*/}
+                {/*</Button.Group>*/}
             </Container>
         );
     }
