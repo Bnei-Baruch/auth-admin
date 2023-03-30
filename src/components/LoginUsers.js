@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {Button, Container, Segment, Popup, Table, Icon, Menu, Input, Label, Header} from "semantic-ui-react";
+import {Button, Container, Segment, Popup, Table, Icon, Menu, Input, Label, Header, Select} from "semantic-ui-react";
 import {getAuthData} from "../shared/tools";
 import {AUTH_API, LOGIN_API, NEWUSERS_ID, CLIENTS} from "../shared/env";
 
@@ -11,17 +11,22 @@ class LoginUsers extends Component {
         request_users: [],
         selected_user: "",
         selected_client: "",
+        search: "email",
         disabled: true,
         loading: true,
         input: "",
         first: 0,
         max: 15,
         user_info: {},
-        counts: CLIENTS
+        counts: CLIENTS,
+        total: 0
     };
 
     componentDidMount() {
         const {counts} = this.state;
+        getAuthData(`${LOGIN_API}/keycloak/count/total`, (data) => {
+            this.setState({total: data.count});
+        });
         getAuthData(`${LOGIN_API}/keycloak/logins`, (users) => {
             this.setState({users, loading: false});
         });
@@ -34,16 +39,10 @@ class LoginUsers extends Component {
     };
 
     searchUser = () => {
-        const {input} = this.state;
-        getAuthData(`${AUTH_API}/search?search=${input}&max=100`, (users) => {
-            users.sort((a, b) => {
-                if (a.createdTimestamp < b.createdTimestamp) return 1;
-                if (a.createdTimestamp > b.createdTimestamp) return -1;
-                return 0;
-            });
-
-            this.setState({users, loading: false, input: ""});
+        const {search, input, users} = this.state;
+        getAuthData(`${LOGIN_API}/users/kv?${search}=${input}`, (users) => {
             console.log(users)
+            this.setState({users, input: ""});
         });
     };
 
@@ -128,11 +127,16 @@ class LoginUsers extends Component {
     }
 
     render() {
-        const {users, selected_client ,selected_user,loading,search,input,user_info, counts} = this.state;
+        const {total, users, selected_client ,selected_user,loading,search,input,user_info, counts} = this.state;
         const {firstName,lastName,groups,roles,social,credentials} = user_info;
 
         let v = (<Icon color='green' name='checkmark'/>);
         let x = (<Icon color='red' name='close'/>);
+
+        const options = [
+            { key: 'email', text: 'Mail', value: 'email' },
+            { key: 'id', text: 'UserID', value: 'user_id' },
+        ]
 
         const gxy_user = !!roles?.find(r => r.name === "gxy_user")
         const crd = credentials?.length ? credentials[0].type : x
@@ -199,6 +203,29 @@ class LoginUsers extends Component {
 
         return (
             <Container fluid>
+                <Menu size='large' secondary>
+                    <Menu.Item>
+                    </Menu.Item>
+                    <Menu.Menu position='left'>
+                        <Input type='text' placeholder='Search..' action value={input}
+                               onChange={(e, { value }) => this.setState({input: value})}>
+                            <input />
+                            <Select compact options={options} value={search}
+                                    onChange={(e, { value }) => this.setState({search: value})}/>
+                            <Button type='submit' color='blue' disabled={!search}
+                                    onClick={() => this.searchUser(search)}>Search</Button>
+                        </Input>
+                    </Menu.Menu>
+                    <Menu.Menu position='right'>
+                        <Menu.Item>
+                        </Menu.Item>
+                        <Menu.Item>
+                            <Label as='a' color='blue' ribbon='right' size='large'>
+                                Total Logins Count: {total}
+                            </Label>
+                        </Menu.Item>
+                    </Menu.Menu>
+                </Menu>
                 <Button.Group attached='top'>
                     {buttons}
                 </Button.Group>
