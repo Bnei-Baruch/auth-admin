@@ -13,4 +13,5 @@ export const CLIENTS = {
     "membership_pay": {name: "Payment", count: 0, icon: "credit card outline"},
     "kmedia-public": {name: "KM Desktop", count: 0, icon: "boxes"},
     "kmedia-mobile": {name: "KM Mobile", count: 0, icon: "mobile"},
+    "crm": {name: "CV", count: 0, icon: "table"},
 }
