@@ -230,10 +230,10 @@ class LoginUsers extends Component {
                     {buttons}
                 </Button.Group>
                 <Segment attached textAlign='center' className="group_list" raised loading={loading} >
-                    <Table selectable compact='very' basic structured className="admin_table" unstackable>
+                    <Table selectable compact='very' basic structured className="admin_table" unstackable fixed>
                         <Table.Body>
                             <Table.Row disabled>
-                                <Table.Cell width={2}>Email</Table.Cell>
+                                <Table.Cell width={4}>Email</Table.Cell>
                                 <Table.Cell width={5}>User ID</Table.Cell>
                                 <Table.Cell width={4}>Last Login</Table.Cell>
                                 {Object.keys(CLIENTS).map(k => {
