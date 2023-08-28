@@ -1,6 +1,7 @@
 export const AUTH_API = process.env.REACT_APP_AUTH_API_BACKEND;
 export const LOGIN_API = process.env.REACT_APP_LOGIN_API_BACKEND;
 export const KC_URL = process.env.REACT_APP_KC_URL;
+export const API_URL = process.env.REACT_APP_API_URL;
 export const PENDING_ID = "c42addf9-5ef6-474c-b5ef-ccc07179c97e";
 export const IGNORED_ID = "4111c55c-1931-4ca1-9f6f-127963d40dcd";
 export const VERIFY_ID = "96a32920-5f34-4678-b8e3-ea26f4143558";
