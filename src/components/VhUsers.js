@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import {Button, Container, Segment, Popup, Table, Icon, Menu, Dropdown, Input, Message} from "semantic-ui-react";
 import DatePicker from "react-datepicker";
 import {getAuthData, getVhData} from "../shared/tools";
-import {AUTH_API, LOGIN_API, CLIENTS, dep_options} from "../shared/env";
+import {AUTH_API, LOGIN_API, CLIENTS, lang_options, status_options, mem_status_options} from "../shared/env";
 
 class VhUsers extends Component {
 
@@ -25,6 +25,7 @@ class VhUsers extends Component {
         total: 0,
         language: "",
         date: null,
+        "membership-type": ""
     };
 
     componentDidMount() {
@@ -90,6 +91,18 @@ class VhUsers extends Component {
         const {filters} = this.state;
         filters.date = date.toLocaleDateString('sv');
         this.setState({filters, date}, () => {
+            this.getData(0, 17);
+        });
+    };
+
+    setStatusFilter = (status) => {
+        if(!status) {
+            this.removeFilter("membership-type");
+            return
+        }
+        const {filters} = this.state;
+        filters["membership-type"] = status
+        this.setState({filters, status}, () => {
             this.getData(0, 17);
         });
     };
@@ -194,7 +207,7 @@ class VhUsers extends Component {
     }
 
     render() {
-        const {profile_users, loading, selected_user, status_from_order, language, date} = this.state;
+        const {profile_users, loading, selected_user, status_from_order, language, date,status} = this.state;
 
         //const {firstName,lastName,groups,roles,social,credentials} = user_info;
         let v = (<Icon color='green' name='checkmark'/>);
@@ -274,12 +287,12 @@ class VhUsers extends Component {
                             placeholder="Language:"
                             selection
                             clearable
-                            options={dep_options}
+                            options={lang_options}
                             language={language}
                             onChange={(e, {value}) => this.setLangFilter(value)}
                             value={language}>
                         </Dropdown>
-                        <DatePicker
+                        <DatePicker disabled
                             // locale={locale}
                             customInput={<Input icon={
                                 <Icon name={date ? 'close' : 'dropdown'} link onClick={() => this.removeFilter("date")} />
@@ -300,6 +313,15 @@ class VhUsers extends Component {
                     </Menu.Menu>
                     <Menu.Menu position='right'>
                         <Menu.Item>
+                            <Dropdown
+                                placeholder="Status:"
+                                selection
+                                clearable
+                                options={mem_status_options}
+                                status={status}
+                                onChange={(e, {value}) => this.setStatusFilter(value)}
+                                value={status}>
+                            </Dropdown>
                         </Menu.Item>
                         <Menu.Item>
                         </Menu.Item>

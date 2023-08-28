@@ -17,6 +17,13 @@ export const getVhData = (url, cb) => {
             'Content-Type': 'application/json'
         }
     }).then((response) => {
+        if(response.status !== 200) {
+            cb([])
+            return
+        }
         return response.json().then(data => cb(data));
-    }).catch(ex => console.log(`get ${url}`, ex));
+    }).catch(ex => {
+        console.log(`get ${url}`, ex)
+        cb([])
+    });
 }

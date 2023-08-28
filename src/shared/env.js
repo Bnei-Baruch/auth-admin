@@ -18,9 +18,16 @@ export const CLIENTS = {
     "sviva-tova": {name: "Sviva Tova", count: 0, icon: "globe"},
 }
 
-export const dep_options = [
+export const lang_options = [
     { key: 'he', value: 'he', flag: 'il', text: 'Hebrew' },
     { key: 'ru', value: 'ru', flag: 'ru', text: 'Russian' },
     { key: 'en', value: 'en', flag: 'us', text: 'English' },
     { key: 'es', value: 'es', flag: 'es', text: 'Spanish' },
+];
+
+export const mem_status_options = [
+    { key: 'active', value: 'active', text: 'Active' },
+    { key: 'inactive', value: 'inactive', text: 'Inactive' },
+    { key: 'grant', value: 'grant', text: 'Grant' },
+    { key: 'manual', value: 'manual', text: 'Manual' },
 ];
