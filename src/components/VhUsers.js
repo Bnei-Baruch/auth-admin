@@ -18,6 +18,7 @@ class VhUsers extends Component {
         first: 0,
         max: 15,
         user_info: {},
+        status_from_order: {},
         counts: CLIENTS,
         total: 0
     };
@@ -79,15 +80,29 @@ class VhUsers extends Component {
     }
 
     selectUser = (id, user) => {
-        console.log(user)
-        const {search, input, users} = this.state;
-        getAuthData(`${AUTH_API}/find?id=${id}`, (response) => {
-            getAuthData(`${AUTH_API}/user/${id}`, (user_info) => {
-                let user = {...response,...user_info}
-                this.setState({selected_user: id, user_info: user});
-                console.log(user)
-            });
+        console.log(user.primary_email)
+        getVhData(`pay/payments/all/${user.primary_email}`, (user) => {
+            // users.sort((a, b) => {
+            //     if (a.createdTimestamp < b.createdTimestamp) return 1;
+            //     if (a.createdTimestamp > b.createdTimestamp) return -1;
+            //     return 0;
+            // });
+
+            //this.setState({profile_users, loading: false, input: ""});
+            console.log(user)
         });
+        getVhData(`pay/status/${user.primary_email}`, (status_from_order) => {
+            this.setState({status_from_order})
+            console.log(status_from_order)
+        });
+        const {search, input, users} = this.state;
+        // getAuthData(`${AUTH_API}/find?id=${id}`, (response) => {
+        //     getAuthData(`${AUTH_API}/user/${id}`, (user_info) => {
+        //         let user = {...response,...user_info}
+        //         this.setState({selected_user: id, user_info: user});
+        //         console.log(user)
+        //     });
+        // });
     }
 
     // approveUser = () => {
@@ -126,9 +141,9 @@ class VhUsers extends Component {
     }
 
     render() {
-        const {profile_users, loading, selected_user} = this.state;
-        //const {firstName,lastName,groups,roles,social,credentials} = user_info;
+        const {profile_users, loading, selected_user, status_from_order} = this.state;
 
+        //const {firstName,lastName,groups,roles,social,credentials} = user_info;
         let v = (<Icon color='green' name='checkmark'/>);
         let x = (<Icon color='red' name='close'/>);
 
@@ -170,32 +185,24 @@ class VhUsers extends Component {
                 </Table.Row>} flowing hoverable on='click'>
                 <Table compact='very' structured unstackable singleLine celled>
                     <Table.Row>
-                        <Table.Cell width={3}>First Name</Table.Cell>
-                        <Table.Cell textAlign='center'>{membership}</Table.Cell>
+                        <Table.Cell width={3}>Special</Table.Cell>
+                        <Table.Cell textAlign='center'>{status_from_order.is_special ? v : x}</Table.Cell>
                     </Table.Row>
                     <Table.Row>
-                        <Table.Cell width={3}>Last Name</Table.Cell>
-                        <Table.Cell textAlign='center'>{membership_type}</Table.Cell>
+                        <Table.Cell width={3}>Membership</Table.Cell>
+                        <Table.Cell textAlign='center'>{status_from_order.membership ? v : x}</Table.Cell>
                     </Table.Row>
                     <Table.Row>
-                        <Table.Cell width={3}>User ID</Table.Cell>
-                        <Table.Cell textAlign='center'>{ticket}</Table.Cell>
+                        <Table.Cell width={3}>Status</Table.Cell>
+                        <Table.Cell textAlign='center'>{status_from_order.status_name}</Table.Cell>
                     </Table.Row>
                     <Table.Row>
-                        <Table.Cell width={3}>Social ID</Table.Cell>
-                        <Table.Cell textAlign='center'>{convention}</Table.Cell>
+                        <Table.Cell width={3}>Ticket</Table.Cell>
+                        <Table.Cell textAlign='center'>{status_from_order.ticket ? v : x}</Table.Cell>
                     </Table.Row>
                     <Table.Row>
-                        <Table.Cell width={2}>Sec Group</Table.Cell>
-                        <Table.Cell textAlign='center'>{galaxy}</Table.Cell>
-                    </Table.Row>
-                    <Table.Row>
-                        <Table.Cell width={2}>Gxy User</Table.Cell>
-                        <Table.Cell textAlign='center'>{created_at}</Table.Cell>
-                    </Table.Row>
-                    <Table.Row>
-                        <Table.Cell width={2}>Credentials</Table.Cell>
-                        <Table.Cell textAlign='center'>{ticket}</Table.Cell>
+                        <Table.Cell width={2}>Color</Table.Cell>
+                        <Table.Cell textAlign='center'>{status_from_order.status_color}</Table.Cell>
                     </Table.Row>
                 </Table>
             </Popup>
