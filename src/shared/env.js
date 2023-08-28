@@ -17,3 +17,10 @@ export const CLIENTS = {
     "crm": {name: "CV", count: 0, icon: "table"},
     "sviva-tova": {name: "Sviva Tova", count: 0, icon: "globe"},
 }
+
+export const dep_options = [
+    { key: 'he', value: 'he', flag: 'il', text: 'Hebrew' },
+    { key: 'ru', value: 'ru', flag: 'ru', text: 'Russian' },
+    { key: 'en', value: 'en', flag: 'us', text: 'English' },
+    { key: 'es', value: 'es', flag: 'es', text: 'Spanish' },
+];

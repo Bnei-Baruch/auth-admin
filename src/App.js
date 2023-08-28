@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import {Segment, Tab} from 'semantic-ui-react'
 import 'semantic-ui-css/semantic.min.css';
+import 'react-datepicker/dist/react-datepicker.css';
 import './App.css';
 import LoginPage from './components/LoginPage';
 import {kc} from "./components/UserManager";
