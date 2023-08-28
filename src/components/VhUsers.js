@@ -25,7 +25,7 @@ class VhUsers extends Component {
         total: 0,
         language: "",
         date: null,
-        "membership-type": ""
+        membership_type: ""
     };
 
     componentDidMount() {
@@ -34,12 +34,6 @@ class VhUsers extends Component {
             console.log(order_users)
             this.setState({order_users});
         });
-        // Object.keys(CLIENTS).map(k => {
-        //     getAuthData(`${LOGIN_API}/keycloak/count/${k}`, (data) => {
-        //         counts[k].count = data.count;
-        //         this.setState({counts});
-        //     });
-        // })
     };
 
     getData = (first, max) => {
@@ -48,35 +42,20 @@ class VhUsers extends Component {
         const query = Object.keys(filters).map(f => f + "=" + filters[f]);
         let path = empty ? `profile/v1/profiles?skip=${first}&limit=${max}` : `profile/v1/profiles?skip=${first}&limit=${max}&`+ query.join('&');
         getVhData(path, (profile_users) => {
-            // users.sort((a, b) => {
-            //     if (a.createdTimestamp < b.createdTimestamp) return 1;
-            //     if (a.createdTimestamp > b.createdTimestamp) return -1;
-            //     return 0;
-            // });
-
             this.setState({profile_users, loading: false, input: ""});
             console.log(profile_users)
         });
     };
 
-    setFilter = (key, value) => {
-        if(!key) {
-            this.removeFilter(key);
-            return
-        }
-        const {filters} = this.state;
-        filters[key] = value
-        this.setState({filters}, () => {
-            this.getData(0, 17);
-        });
-    };
-
     setLangFilter = (language) => {
+        const {filters} = this.state;
         if(!language) {
-            this.removeFilter("language");
+            delete filters["language"];
+            this.setState({filters, language: ""}, () => {
+                this.getData(0, 17);
+            });
             return
         }
-        const {filters} = this.state;
         filters.language = language
         this.setState({filters, language}, () => {
             this.getData(0, 17);
@@ -84,43 +63,32 @@ class VhUsers extends Component {
     };
 
     setDateFilter = (date) => {
+        const {filters} = this.state;
         if(!date) {
-            this.removeFilter("date");
+            delete filters["date"];
+            this.setState({filters, date: ""}, () => {
+                this.getData(0, 17);
+            });
             return
         }
-        const {filters} = this.state;
         filters.date = date.toLocaleDateString('sv');
         this.setState({filters, date}, () => {
             this.getData(0, 17);
         });
     };
 
-    setStatusFilter = (status) => {
-        if(!status) {
-            this.removeFilter("membership-type");
+    setStatusFilter = (membership_type)=> {
+        const {filters} = this.state;
+        if(!membership_type) {
+            delete filters["membership-type"];
+            this.setState({filters, membership_type: ""}, () => {
+                this.getData(0, 17);
+            });
             return
         }
-        const {filters} = this.state;
-        filters["membership-type"] = status
-        this.setState({filters, status}, () => {
+        filters["membership-type"] = membership_type
+        this.setState({filters, membership_type}, () => {
             this.getData(0, 17);
-        });
-    };
-
-    removeFilter = (f) => {
-        const {filters} = this.state;
-        delete filters[f];
-        const value = f === "film_date" ? null : "";
-        this.setState({filters, [f]: value}, () => {
-            this.getData(0, 17);
-        });
-    };
-
-    searchUser = () => {
-        const {search, input, users} = this.state;
-        getAuthData(`${LOGIN_API}/users/kv?${search}=${input}`, (users) => {
-            console.log(users)
-            this.setState({users, input: ""});
         });
     };
 
@@ -148,20 +116,13 @@ class VhUsers extends Component {
     selectUser = (id, user) => {
         console.log(user)
         getVhData(`pay/payments/all/${user.primary_email}`, (user) => {
-            // users.sort((a, b) => {
-            //     if (a.createdTimestamp < b.createdTimestamp) return 1;
-            //     if (a.createdTimestamp > b.createdTimestamp) return -1;
-            //     return 0;
-            // });
-
-            //this.setState({profile_users, loading: false, input: ""});
             console.log(user)
         });
         getVhData(`pay/status/${user.primary_email}`, (status_from_order) => {
             this.setState({status_from_order})
             console.log(status_from_order)
         });
-        const {search, input, users} = this.state;
+        // const {search, input, users} = this.state;
         // getAuthData(`${AUTH_API}/find?id=${id}`, (response) => {
         //     getAuthData(`${AUTH_API}/user/${id}`, (user_info) => {
         //         let user = {...response,...user_info}
@@ -171,45 +132,14 @@ class VhUsers extends Component {
         // });
     }
 
-    // approveUser = () => {
-    //     const {selected_user,users} = this.state;
-    //     console.log(selected_user);
-    //     getAuthData(`${AUTH_API}/approve/${selected_user}`, (response) => {
-    //         for (let i = 0; i < users.length; i++) {
-    //             if (users[i].id === selected_user) {
-    //                 users.splice(i, 1);
-    //                 this.setState({selected_user: "",users});
-    //                 break;
-    //             }
-    //         }
-    //         alert(response.result);
-    //     });
-    // }
-    //
-    // removeUser = () => {
-    //     const {selected_user,users} = this.state;
-    //     console.log(selected_user);
-    //     getAuthData(`${AUTH_API}/remove/${selected_user}`, (response) => {
-    //         for (let i = 0; i < users.length; i++) {
-    //             if (users[i].id === selected_user) {
-    //                 users.splice(i, 1);
-    //                 this.setState({selected_user: "",users});
-    //                 break;
-    //             }
-    //         }
-    //         alert(response.result);
-    //     });
-    // }
-
     setRequest = () => {
         const {input} = this.state;
         console.log(input);
     }
 
     render() {
-        const {profile_users, loading, selected_user, status_from_order, language, date,status} = this.state;
+        const {profile_users, loading, selected_user, status_from_order, language, date,membership_type} = this.state;
 
-        //const {firstName,lastName,groups,roles,social,credentials} = user_info;
         let v = (<Icon color='green' name='checkmark'/>);
         let x = (<Icon color='red' name='close'/>);
 
@@ -217,22 +147,6 @@ class VhUsers extends Component {
             { key: 'email', text: 'Mail', value: 'email' },
             { key: 'id', text: 'UserID', value: 'user_id' },
         ]
-
-        // const gxy_user = !!roles?.find(r => r.name === "gxy_user")
-        // const crd = credentials?.length ? credentials[0].type : x
-        // const idp = social?.length ? social[0].identityProvider : x
-        // const grp = groups?.length ? groups[0].name : ""
-        //
-        // const buttons = Object.keys(CLIENTS).map(k => {
-        //     return (
-        //         <Button basic content={CLIENTS[k].name}
-        //                 color={selected_client === k ? 'pink' : 'blue'}
-        //                 onClick={() => this.setClient(k)}
-        //                 icon={CLIENTS[k].icon}
-        //                 label={{ as: 'a', basic: true, color: 'blue', content: counts[k].count}} />
-        //
-        //     )
-        // })
 
         let users_content = profile_users.map(user => {
             const {keycloak_id,first_name_latin,last_name_latin,country,city,first_language,primary_email,created_at,study_start_year,status} = user;
@@ -318,9 +232,8 @@ class VhUsers extends Component {
                                 selection
                                 clearable
                                 options={mem_status_options}
-                                status={status}
                                 onChange={(e, {value}) => this.setStatusFilter(value)}
-                                value={status}>
+                                value={membership_type}>
                             </Dropdown>
                         </Menu.Item>
                         <Menu.Item>
