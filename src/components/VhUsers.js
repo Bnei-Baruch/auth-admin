@@ -1,5 +1,17 @@
 import React, { Component } from 'react';
-import {Button, Container, Segment, Popup, Table, Icon, Menu, Dropdown, Input, Message} from "semantic-ui-react";
+import {
+    Button,
+    Container,
+    Segment,
+    Popup,
+    Table,
+    Icon,
+    Menu,
+    Dropdown,
+    Input,
+    Message,
+    Select
+} from "semantic-ui-react";
 import DatePicker from "react-datepicker";
 import {getAuthData, getVhData} from "../shared/tools";
 import {AUTH_API, LOGIN_API, CLIENTS, lang_options, mem_status_options} from "../shared/env";
@@ -28,7 +40,7 @@ class VhUsers extends Component {
         language: "",
         date: null,
         membership_type: "",
-        open_edit: false
+        open_edit: false,
     };
 
     componentDidMount() {
@@ -148,15 +160,30 @@ class VhUsers extends Component {
         console.log(input);
     }
 
+    searchUser = () => {
+        this.setState({loading: true});
+        const {search, input, users} = this.state;
+        //let path = empty ? `profile/v1/profiles?skip=${first}&limit=${max}` : `profile/v1/profiles?skip=${first}&limit=${max}&`+ query.join('&');
+        getVhData(`profile/v1/profiles?${search}=${input}`, (profile_users) => {
+            this.setState({profile_users, loading: false, input: ""});
+            console.log(profile_users)
+        });
+        // getAuthData(`${AUTH_API}/find?${search}=${input}`, (response) => {
+        //     users.push(response)
+        //     console.log(response)
+        //     this.setState({input: ""});
+        // });
+    };
+
     render() {
-        const {profile_users, loading, selected_user, status_from_order, language, date,membership_type} = this.state;
+        const {profile_users, loading, selected_user, status_from_order, language, date,membership_type, input, search} = this.state;
 
         let v = (<Icon color='green' name='checkmark'/>);
         let x = (<Icon color='red' name='close'/>);
 
         const options = [
             { key: 'email', text: 'Mail', value: 'email' },
-            { key: 'id', text: 'UserID', value: 'user_id' },
+            { key: 'name', text: 'Name', value: 'name' },
         ]
 
         let users_content = profile_users.map(user => {
@@ -203,36 +230,46 @@ class VhUsers extends Component {
                 <Message size='large'>
                 <Menu size='large' secondary>
                     <Menu.Item>
-                        <Dropdown
-                            placeholder="Language:"
-                            selection
-                            clearable
-                            options={lang_options}
-                            language={language}
-                            onChange={(e, {value}) => this.setLangFilter(value)}
-                            value={language}>
-                        </Dropdown>
-                        <DatePicker disabled
-                            // locale={locale}
-                            customInput={<Input icon={
-                                <Icon name={date ? 'close' : 'dropdown'} link onClick={() => this.removeFilter("date")} />
-                            }/>}
-                            dateFormat="yyyy-MM-dd"
-                            showYearDropdown
-                            showMonthDropdown
-                            scrollableYearDropdown
-                            maxDate={new Date()}
-                            openToDate={new Date()}
-                            selected={date ? date : null}
-                            placeholderText="Date:"
-                            onChange={this.setDateFilter}
-                        />
+                        <Menu.Item>
+                            <Input type='text' placeholder='Search..' action value={input}
+                                   onChange={(e, { value }) => this.setState({input: value})}>
+                                <input />
+                                <Select compact options={options} value={search}
+                                        onChange={(e, { value }) => this.setState({search: value})}/>
+                                <Button type='submit' color='blue' disabled={!search}
+                                        onClick={() => this.searchUser(search)}>Search</Button>
+                            </Input>
+                        </Menu.Item>
+                        {/*<DatePicker disabled*/}
+                        {/*    // locale={locale}*/}
+                        {/*    customInput={<Input icon={*/}
+                        {/*        <Icon name={date ? 'close' : 'dropdown'} link onClick={() => this.removeFilter("date")} />*/}
+                        {/*    }/>}*/}
+                        {/*    dateFormat="yyyy-MM-dd"*/}
+                        {/*    showYearDropdown*/}
+                        {/*    showMonthDropdown*/}
+                        {/*    scrollableYearDropdown*/}
+                        {/*    maxDate={new Date()}*/}
+                        {/*    openToDate={new Date()}*/}
+                        {/*    selected={date ? date : null}*/}
+                        {/*    placeholderText="Date:"*/}
+                        {/*    onChange={this.setDateFilter}*/}
+                        {/*/>*/}
                     </Menu.Item>
                     <Menu.Menu>
 
                     </Menu.Menu>
                     <Menu.Menu position='right'>
                         <Menu.Item>
+                            <Dropdown
+                                placeholder="Language:"
+                                selection
+                                clearable
+                                options={lang_options}
+                                language={language}
+                                onChange={(e, {value}) => this.setLangFilter(value)}
+                                value={language}>
+                            </Dropdown>
                             <Dropdown
                                 placeholder="Status:"
                                 selection

@@ -27,9 +27,9 @@ class VhEdit extends Component {
 
         return (
             <Modal open={open_edit} onClose={() => this.props.closeModal()} size='large' >
-                <Modal.Header>
-                    <Header textAlign="center" >Edit User</Header>
-                </Modal.Header>
+                {/*<Modal.Header>*/}
+                {/*    <Header textAlign="center" >Edit User</Header>*/}
+                {/*</Modal.Header>*/}
                 <Modal.Content>
                     <Form size='large'>
                         {/*<Form.Group widths='equal'>*/}
@@ -97,24 +97,24 @@ class VhEdit extends Component {
                     {/*<Button fluid disabled={!active} onClick={this.clearSelection}>Clear</Button>*/}
                     {/*</Modal.Description>*/}
                 </Modal.Content>
-                <Modal.Actions>
-                    <Menu secondary >
-                        <Menu.Item>
-                            <Button positive
-                                    disabled
-                                    onClick={this.setRemoved}>Save
-                            </Button>
-                        </Menu.Item>
-                        <Menu.Menu position='right'>
-                            <Menu.Item>
-                                <Button negative={true}
-                                        disabled
-                                        onClick={this.setRemoved}>Remove
-                                </Button>
-                            </Menu.Item>
-                        </Menu.Menu>
-                    </Menu>
-                </Modal.Actions>
+                {/*<Modal.Actions>*/}
+                {/*    <Menu secondary >*/}
+                {/*        <Menu.Item>*/}
+                {/*            <Button positive*/}
+                {/*                    disabled*/}
+                {/*                    onClick={this.setRemoved}>Save*/}
+                {/*            </Button>*/}
+                {/*        </Menu.Item>*/}
+                {/*        <Menu.Menu position='right'>*/}
+                {/*            <Menu.Item>*/}
+                {/*                <Button negative={true}*/}
+                {/*                        disabled*/}
+                {/*                        onClick={this.setRemoved}>Remove*/}
+                {/*                </Button>*/}
+                {/*            </Menu.Item>*/}
+                {/*        </Menu.Menu>*/}
+                {/*    </Menu>*/}
+                {/*</Modal.Actions>*/}
             </Modal>
         );
     }
