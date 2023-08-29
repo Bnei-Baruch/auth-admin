@@ -2,7 +2,8 @@ import React, { Component } from 'react';
 import {Button, Container, Segment, Popup, Table, Icon, Menu, Dropdown, Input, Message} from "semantic-ui-react";
 import DatePicker from "react-datepicker";
 import {getAuthData, getVhData} from "../shared/tools";
-import {AUTH_API, LOGIN_API, CLIENTS, lang_options, status_options, mem_status_options} from "../shared/env";
+import {AUTH_API, LOGIN_API, CLIENTS, lang_options, mem_status_options} from "../shared/env";
+import VhEdit from "./VhEdit";
 
 class VhUsers extends Component {
 
@@ -11,6 +12,7 @@ class VhUsers extends Component {
         users: [],
         profile_users: [],
         order_users: [],
+        payments: [],
         selected_user: "",
         selected_client: "",
         search: "email",
@@ -25,7 +27,8 @@ class VhUsers extends Component {
         total: 0,
         language: "",
         date: null,
-        membership_type: ""
+        membership_type: "",
+        open_edit: false
     };
 
     componentDidMount() {
@@ -115,21 +118,29 @@ class VhUsers extends Component {
 
     selectUser = (id, user) => {
         console.log(user)
-        getVhData(`pay/payments/all/${user.primary_email}`, (user) => {
-            console.log(user)
+        getVhData(`pay/payments/all/${user.primary_email}`, (payments) => {
+            this.setState({payments})
+            console.log(payments)
         });
+        // getVhData(`pay/v2/orders`, (user) => {
+        //     console.log(user)
+        // });
         getVhData(`pay/status/${user.primary_email}`, (status_from_order) => {
             this.setState({status_from_order})
             console.log(status_from_order)
         });
-        // const {search, input, users} = this.state;
-        // getAuthData(`${AUTH_API}/find?id=${id}`, (response) => {
-        //     getAuthData(`${AUTH_API}/user/${id}`, (user_info) => {
-        //         let user = {...response,...user_info}
-        //         this.setState({selected_user: id, user_info: user});
-        //         console.log(user)
-        //     });
-        // });
+        const {search, input, users} = this.state;
+        getAuthData(`${AUTH_API}/find?id=${id}`, (response) => {
+            getAuthData(`${AUTH_API}/user/${id}`, (user_info) => {
+                let kc_user = {...response,...user_info}
+                this.setState({selected_user: user, user_info: kc_user, open_edit: true});
+                console.log(kc_user)
+            });
+        });
+    }
+
+    clearSelection = () => {
+        this.setState({selected_user: "", open_edit: false})
     }
 
     setRequest = () => {
@@ -152,9 +163,27 @@ class VhUsers extends Component {
             const {keycloak_id,first_name_latin,last_name_latin,country,city,first_language,primary_email,created_at,study_start_year,status} = user;
             const {membership,membership_type,ticket,convention,galaxy} = status
             //const created_at = new Date(time).toUTCString();
-            return (<Popup trigger={<Table.Row key={keycloak_id}
-                                               active={keycloak_id === selected_user}
-                                               onClick={() => this.selectUser(keycloak_id, user)} >
+            return (<Table.Row key={keycloak_id}
+                               active={keycloak_id === selected_user}
+                               onClick={() => this.selectUser(keycloak_id, user)} >
+                    <Table.Cell textAlign='center'>
+                        <Popup flowing size='mini' position='right center'
+                               content={
+                                   <Table compact='very'>
+                                       {Object.keys(user)?.map(s => {
+                                           if(s === "status") return
+                                           return (<Table.Row className='table_header'>
+                                               <Table.HeaderCell key={s} width={5}>{s}</Table.HeaderCell>
+                                               <Table.Cell key={s + 'val'} >{user[s]}</Table.Cell>
+                                           </Table.Row>)
+                                       })}
+                                   </Table>
+                               }
+                               trigger={<Icon size='large' name='attention' />}
+                               // onOpen={() => this.parentInfo(parent)}
+                               // onClose={() => this.setState({parent_info: <Segment basic><Loader active /></Segment>})}
+                        />
+                    </Table.Cell>
                     <Table.Cell>{first_name_latin}</Table.Cell>
                     <Table.Cell>{last_name_latin}</Table.Cell>
                     <Table.Cell>{keycloak_id}</Table.Cell>
@@ -165,30 +194,7 @@ class VhUsers extends Component {
                     <Table.Cell>{first_language}</Table.Cell>
                     <Table.Cell>{created_at}</Table.Cell>
                     <Table.Cell>{membership_type}</Table.Cell>
-                </Table.Row>} flowing hoverable on='click'>
-                <Table compact='very' structured unstackable singleLine celled>
-                    <Table.Row>
-                        <Table.Cell width={3}>Special</Table.Cell>
-                        <Table.Cell textAlign='center'>{status_from_order.is_special ? v : x}</Table.Cell>
-                    </Table.Row>
-                    <Table.Row>
-                        <Table.Cell width={3}>Membership</Table.Cell>
-                        <Table.Cell textAlign='center'>{status_from_order.membership ? v : x}</Table.Cell>
-                    </Table.Row>
-                    <Table.Row>
-                        <Table.Cell width={3}>Status</Table.Cell>
-                        <Table.Cell textAlign='center'>{status_from_order.status_name}</Table.Cell>
-                    </Table.Row>
-                    <Table.Row>
-                        <Table.Cell width={3}>Ticket</Table.Cell>
-                        <Table.Cell textAlign='center'>{status_from_order.ticket ? v : x}</Table.Cell>
-                    </Table.Row>
-                    <Table.Row>
-                        <Table.Cell width={2}>Color</Table.Cell>
-                        <Table.Cell textAlign='center'>{status_from_order.status_color}</Table.Cell>
-                    </Table.Row>
-                </Table>
-            </Popup>
+                </Table.Row>
             )
         });
 
@@ -244,10 +250,15 @@ class VhUsers extends Component {
                 <Button.Group attached='top'>
                     {/*{buttons}*/}
                 </Button.Group>
+                <VhEdit
+                    {...this.state}
+                    setProps={(props) => this.setState({...props})}
+                    closeModal={this.clearSelection} />
                 <Segment attached textAlign='center' className="group_list" raised loading={loading} >
                     <Table selectable compact='very' basic structured className="admin_table" unstackable fixed>
                         <Table.Body>
                             <Table.Row disabled>
+                                <Table.Cell width={1}></Table.Cell>
                                 <Table.Cell width={2}>First Name</Table.Cell>
                                 <Table.Cell width={2}>Last Name</Table.Cell>
                                 <Table.Cell width={4}>User ID</Table.Cell>
