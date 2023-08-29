@@ -32,7 +32,7 @@ class VhUsers extends Component {
         loading: true,
         input: "",
         first: 0,
-        max: 15,
+        max: 100,
         user_info: {},
         status_from_order: {},
         counts: CLIENTS,
@@ -51,8 +51,8 @@ class VhUsers extends Component {
         });
     };
 
-    getData = (first, max) => {
-        const {filters} = this.state;
+    getData = (first) => {
+        const {filters, max} = this.state;
         let empty = Object.keys(filters).length === 0
         const query = Object.keys(filters).map(f => f + "=" + filters[f]);
         let path = empty ? `profile/v1/profiles?skip=${first}&limit=${max}` : `profile/v1/profiles?skip=${first}&limit=${max}&`+ query.join('&');
@@ -176,7 +176,7 @@ class VhUsers extends Component {
     };
 
     render() {
-        const {profile_users, loading, selected_user, status_from_order, language, date,membership_type, input, search} = this.state;
+        const {profile_users, loading, selected_user, max, language, date,membership_type, input, search} = this.state;
 
         let v = (<Icon color='green' name='checkmark'/>);
         let x = (<Icon color='red' name='close'/>);
@@ -184,6 +184,14 @@ class VhUsers extends Component {
         const options = [
             { key: 'email', text: 'Mail', value: 'email' },
             { key: 'name', text: 'Name', value: 'name' },
+        ]
+
+        const max_options = [
+            { key: 'l1', text: '10', value: 10 },
+            { key: 'l2', text: '50', value: 50 },
+            { key: 'l3', text: '100', value: 100 },
+            { key: 'l4', text: '500', value: 500 },
+            { key: 'l5', text: '1000', value: 1000 },
         ]
 
         let users_content = profile_users.map(user => {
@@ -311,8 +319,12 @@ class VhUsers extends Component {
                         </Table.Body>
                     </Table>
                 </Segment>
-                <Button.Group attached='bottom' >
+                <Button.Group attached='bottom' compact inverted size='mini'>
                     <Button icon onClick={this.getReverce} ><Icon name='angle double left' /></Button>
+                    <Button>
+                        <Select compact options={max_options} value={max}
+                                onChange={(e, { value }) => this.setState({max: value})}/>
+                    </Button>
                     <Button icon onClick={this.getForward} ><Icon name='angle double right' /></Button>
                 </Button.Group>
             </Container>
