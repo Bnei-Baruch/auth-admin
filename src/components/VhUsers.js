@@ -46,7 +46,7 @@ class VhUsers extends Component {
     componentDidMount() {
        this.getData(0, 17)
         getVhData(`pay/payments/activities`, (order_users) => {
-            console.log(order_users)
+            console.log("ACTIVITIES", order_users)
             this.setState({order_users});
         });
     };
@@ -132,11 +132,12 @@ class VhUsers extends Component {
         console.log(user)
         getVhData(`pay/payments/all/${user.primary_email}`, (payments) => {
             this.setState({payments})
-            console.log(payments)
+            console.log("PAYMENTS", payments)
         });
-        // getVhData(`pay/v2/orders`, (user) => {
-        //     console.log(user)
-        // });
+        getVhData(`pay/v2/orders?email=${user.primary_email}`, (orders) => {
+            this.setState({orders})
+            console.log("ORDERS", orders)
+        });
         getVhData(`pay/status/${user.primary_email}`, (status_from_order) => {
             this.setState({status_from_order})
             console.log(status_from_order)
