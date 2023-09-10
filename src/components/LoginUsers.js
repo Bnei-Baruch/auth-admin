@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
-import {Button, Container, Segment, Popup, Table, Icon, Menu, Input, Label, Header, Select} from "semantic-ui-react";
+import {Button, Container, Segment, Popup, Table, Icon, Menu, Input, Label, Pagination, Select} from "semantic-ui-react";
 import {getAuthData} from "../shared/tools";
 import {AUTH_API, LOGIN_API, NEWUSERS_ID, CLIENTS} from "../shared/env";
 
 class LoginUsers extends Component {
 
     state = {
+        all: [],
         users: [],
         pending_users: [],
         request_users: [],
@@ -19,7 +20,9 @@ class LoginUsers extends Component {
         max: 15,
         user_info: {},
         counts: CLIENTS,
-        total: 0
+        total: 0,
+        page: 1,
+        filter: "all"
     };
 
     componentDidMount() {
@@ -62,8 +65,50 @@ class LoginUsers extends Component {
     }
 
     setClient = (k) => {
-        getAuthData(`${LOGIN_API}/keycloak/logins/${k}`, (users) => {
-            this.setState({users, selected_client: k});
+        this.setState({loading: true});
+        getAuthData(`${LOGIN_API}/keycloak/logins/${k}?limit=10000`, (users) => {
+            this.setState({all: users, selected_client: k, loading: false}, () => {
+                this.selectPage(1)
+            });
+        });
+    }
+
+    selectPage = (value) => {
+        console.log(value)
+        const {all} = this.state;
+        const page_number = value;
+        const page_size = 100;
+        const users = all.slice((page_number - 1) * page_size, page_number * page_size)
+        console.log(users)
+        this.setState({ users, page: value});
+    }
+
+    handleClick = (value) => {
+        const {selected_client} = this.state;
+        if(selected_client === "") return
+        this.setState({ filter: value});
+        let d = new Date();
+        let h = d.setMonth(d.getMonth()-1);
+
+        this.setState({loading: true});
+        getAuthData(`${LOGIN_API}/keycloak/logins/${selected_client}?limit=10000`, (users) => {
+            if(value === "active") {
+                let a = users.filter(u => u.logins[selected_client]?.time > h);
+                this.setState({ all: a, loading: false}, () => {
+                    this.selectPage(1)
+                });
+            }
+            if(value === "inactive") {
+                let a = users.filter(u => u.logins[selected_client]?.time < h);
+                this.setState({ all: a, loading: false}, () => {
+                    this.selectPage(1)
+                });
+            }
+            if(value === "all") {
+                this.setState({ all: users, loading: false}, () => {
+                    this.selectPage(1)
+                });
+            }
         });
     }
 
@@ -127,7 +172,7 @@ class LoginUsers extends Component {
     }
 
     render() {
-        const {total, users, selected_client ,selected_user,loading,search,input,user_info, counts} = this.state;
+        const {filter, page, all, total, users, selected_client ,selected_user,loading,search,input,user_info, counts} = this.state;
         const {firstName,lastName,groups,roles,social,credentials} = user_info;
 
         let v = (<Icon color='green' name='checkmark'/>);
@@ -144,19 +189,23 @@ class LoginUsers extends Component {
         const grp = groups?.length ? groups[0].name : ""
 
         const buttons = Object.keys(CLIENTS).map(k => {
+            let count = counts[k].count
+            if(k === selected_client) {
+                count = all.length
+            }
             return (
                 <Button basic content={CLIENTS[k].name}
                         color={selected_client === k ? 'pink' : 'blue'}
                         onClick={() => this.setClient(k)}
                         icon={CLIENTS[k].icon}
-                        label={{ as: 'a', basic: true, color: 'blue', content: counts[k].count}} />
+                        label={{ as: 'a', basic: true, color: 'blue', content: count}} />
 
             )
         })
 
         let users_content = users.map(user => {
             const {user_id,email,time,logins} = user;
-            const login_time = new Date(time).toUTCString();
+            const login_time = selected_client === "" ? new Date(time).toUTCString() : new Date(logins[selected_client]?.time).toUTCString();
             return (<Popup trigger={<Table.Row key={user_id}
                                                active={user_id === selected_user}
                                                onClick={() => this.selectUser(user_id, user)} >
@@ -204,8 +253,6 @@ class LoginUsers extends Component {
         return (
             <Container fluid>
                 <Menu size='large' secondary>
-                    <Menu.Item>
-                    </Menu.Item>
                     <Menu.Menu position='left'>
                         <Input type='text' placeholder='Search..' action value={input}
                                onChange={(e, { value }) => this.setState({input: value})}>
@@ -243,6 +290,13 @@ class LoginUsers extends Component {
                         </Table.Body>
                     </Table>
                 </Segment>
+                <Pagination pointing
+                            secondary defaultActivePage={1} activePage={page} onPageChange={(e, { activePage }) => this.selectPage(activePage)} totalPages={Math.round(all.length/100 * 10) / 10} />
+                <Button.Group size='big'>
+                    <Button disabled={filter === "active"} onClick={() => this.handleClick("active")}>Active</Button>
+                    <Button disabled={filter === "inactive"} onClick={() => this.handleClick("inactive")}>Inactive</Button>
+                    <Button disabled={filter === "all"} onClick={() => this.handleClick("all")}>All</Button>
+                </Button.Group>
                 {/*<Button.Group attached='bottom' >*/}
                 {/*    <Button icon onClick={this.getReverce} ><Icon name='angle double left' /></Button>*/}
                 {/*    <Button icon onClick={this.getForward} ><Icon name='angle double right' /></Button>*/}
