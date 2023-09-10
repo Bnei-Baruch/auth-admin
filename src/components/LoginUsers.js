@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import {Button, Container, Segment, Popup, Table, Icon, Menu, Input, Label, Pagination, Select} from "semantic-ui-react";
-import {getAuthData} from "../shared/tools";
+import {getAuthData, getVhData} from "../shared/tools";
 import {AUTH_API, LOGIN_API, NEWUSERS_ID, CLIENTS} from "../shared/env";
 
 class LoginUsers extends Component {
@@ -129,9 +129,12 @@ class LoginUsers extends Component {
         const {search, input, users} = this.state;
         getAuthData(`${AUTH_API}/find?id=${id}`, (response) => {
             getAuthData(`${AUTH_API}/user/${id}`, (user_info) => {
-                let user = {...response,...user_info}
-                this.setState({selected_user: id, user_info: user});
-                console.log(user)
+                getVhData(`pay/status/${response.email}`, (vh_status) => {
+                    console.log(vh_status)
+                    let user = {...response,...user_info,...vh_status}
+                    this.setState({selected_user: id, user_info: user});
+                    console.log(user)
+                });
             });
         });
     }
@@ -173,7 +176,7 @@ class LoginUsers extends Component {
 
     render() {
         const {filter, page, all, total, users, selected_client ,selected_user,loading,search,input,user_info, counts} = this.state;
-        const {firstName,lastName,groups,roles,social,credentials} = user_info;
+        const {firstName,lastName,groups,roles,social,credentials,membership} = user_info;
 
         let v = (<Icon color='green' name='checkmark'/>);
         let x = (<Icon color='red' name='close'/>);
@@ -187,6 +190,7 @@ class LoginUsers extends Component {
         const crd = credentials?.length ? credentials[0].type : x
         const idp = social?.length ? social[0].identityProvider : x
         const grp = groups?.length ? groups[0].name : ""
+        const vhs = membership ? v : x;
 
         const buttons = Object.keys(CLIENTS).map(k => {
             let count = counts[k].count
@@ -244,6 +248,10 @@ class LoginUsers extends Component {
                     <Table.Row>
                         <Table.Cell width={2}>Credentials</Table.Cell>
                         <Table.Cell textAlign='center'>{crd}</Table.Cell>
+                    </Table.Row>
+                    <Table.Row>
+                        <Table.Cell width={2}>Membership</Table.Cell>
+                        <Table.Cell textAlign='center'>{vhs}</Table.Cell>
                     </Table.Row>
                 </Table>
             </Popup>
