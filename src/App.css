@@ -89,6 +89,10 @@
   color: #ac0013;
 }
 
+.react-datepicker-popper {
+  z-index: 10;
+}
+
 .toggle {
   max-width: 200px;
 }

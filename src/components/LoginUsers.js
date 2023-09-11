@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import {Button, Container, Segment, Popup, Table, Icon, Menu, Input, Label, Pagination, Select} from "semantic-ui-react";
 import {getAuthData, getVhData} from "../shared/tools";
 import {AUTH_API, LOGIN_API, NEWUSERS_ID, CLIENTS} from "../shared/env";
+import DatePicker from "react-datepicker";
 
 class LoginUsers extends Component {
 
@@ -22,7 +23,9 @@ class LoginUsers extends Component {
         counts: CLIENTS,
         total: 0,
         page: 1,
-        filter: "all"
+        filter: "all",
+        date: null,
+        days: null,
     };
 
     componentDidMount() {
@@ -39,6 +42,13 @@ class LoginUsers extends Component {
                 this.setState({counts});
             });
         })
+    };
+
+    setDateFilter = (date) => {
+        let timeIval = new Date().getTime() - date.getTime();
+        var daysIval = Math.round(timeIval / (1000 * 3600 * 24));
+        console.log(daysIval)
+        this.setState({date, days: daysIval})
     };
 
     searchUser = () => {
@@ -64,6 +74,13 @@ class LoginUsers extends Component {
         this.setState({first});
     }
 
+    removeFilter = () => {
+        const {selected_client} = this.state;
+        this.setState({days: null, date: null})
+        this.setClient(selected_client)
+
+    }
+
     setClient = (k) => {
         this.setState({loading: true});
         getAuthData(`${LOGIN_API}/keycloak/logins/${k}?limit=10000`, (users) => {
@@ -84,32 +101,50 @@ class LoginUsers extends Component {
     }
 
     handleClick = (value) => {
-        const {selected_client} = this.state;
+        const {days,selected_client} = this.state;
         if(selected_client === "") return
+        if(!this.state.days) return
         this.setState({ filter: value});
         let d = new Date();
         let h = d.setMonth(d.getMonth()-1);
 
         this.setState({loading: true});
-        getAuthData(`${LOGIN_API}/keycloak/logins/${selected_client}?limit=10000`, (users) => {
-            if(value === "active") {
-                let a = users.filter(u => u.logins[selected_client]?.time > h);
-                this.setState({ all: a, loading: false}, () => {
+
+        if(value === "inactive") {
+            getAuthData(`${LOGIN_API}/keycloak/time/${selected_client}?before=${days}&limit=10000`, (all) => {
+                this.setState({all, loading: false}, () => {
                     this.selectPage(1)
                 });
-            }
-            if(value === "inactive") {
-                let a = users.filter(u => u.logins[selected_client]?.time < h);
-                this.setState({ all: a, loading: false}, () => {
+            })
+        }
+
+        if(value === "active") {
+            getAuthData(`${LOGIN_API}/keycloak/time/${selected_client}?after=${days}&limit=10000`, (all) => {
+                this.setState({all, loading: false}, () => {
                     this.selectPage(1)
                 });
-            }
-            if(value === "all") {
-                this.setState({ all: users, loading: false}, () => {
-                    this.selectPage(1)
-                });
-            }
-        });
+            })
+        }
+
+        // getAuthData(`${LOGIN_API}/keycloak/logins/${selected_client}?limit=10000`, (users) => {
+        //     if(value === "active") {
+        //         let a = users.filter(u => u.logins[selected_client]?.time > h);
+        //         this.setState({ all: a, loading: false}, () => {
+        //             this.selectPage(1)
+        //         });
+        //     }
+        //     if(value === "inactive") {
+        //         let a = users.filter(u => u.logins[selected_client]?.time < h);
+        //         this.setState({ all: a, loading: false}, () => {
+        //             this.selectPage(1)
+        //         });
+        //     }
+        //     if(value === "all") {
+        //         this.setState({ all: users, loading: false}, () => {
+        //             this.selectPage(1)
+        //         });
+        //     }
+        // });
     }
 
     getData = (first, max) => {
@@ -175,7 +210,7 @@ class LoginUsers extends Component {
     }
 
     render() {
-        const {filter, page, all, total, users, selected_client ,selected_user,loading,search,input,user_info, counts} = this.state;
+        const {days, date, filter, page, all, total, users, selected_client ,selected_user,loading,search,input,user_info, counts} = this.state;
         const {firstName,lastName,groups,roles,social,credentials,membership} = user_info;
 
         let v = (<Icon color='green' name='checkmark'/>);
@@ -262,17 +297,41 @@ class LoginUsers extends Component {
             <Container fluid>
                 <Menu size='large' secondary>
                     <Menu.Menu position='left'>
-                        <Input type='text' placeholder='Search..' action value={input}
-                               onChange={(e, { value }) => this.setState({input: value})}>
-                            <input />
-                            <Select compact options={options} value={search}
-                                    onChange={(e, { value }) => this.setState({search: value})}/>
-                            <Button type='submit' color='blue' disabled={!search}
-                                    onClick={() => this.searchUser(search)}>Search</Button>
-                        </Input>
+                        <Menu.Item>
+                            <DatePicker
+                                // locale={locale}
+                                customInput={<Input icon={
+                                    <Icon name={date ? 'close' : 'dropdown'} link onClick={() => this.removeFilter("date")} />
+                                }/>}
+                                dateFormat="yyyy-MM-dd"
+                                showYearDropdown
+                                showMonthDropdown
+                                scrollableYearDropdown
+                                maxDate={new Date()}
+                                openToDate={new Date()}
+                                selected={date ? date : null}
+                                placeholderText="Date:"
+                                onChange={this.setDateFilter}
+                            />
+                        </Menu.Item>
+                        <Menu.Item>
+                            <Button.Group>
+                                <Button disabled={!selected_client} onClick={() => this.handleClick("active")}>Active</Button>
+                                <Button disabled={!selected_client} onClick={() => this.handleClick("inactive")}>Inactive</Button>
+                                {/*<Button disabled={filter === "all"} onClick={() => this.handleClick("all")}>All</Button>*/}
+                            </Button.Group>
+                        </Menu.Item>
                     </Menu.Menu>
                     <Menu.Menu position='right'>
                         <Menu.Item>
+                            <Input type='text' placeholder='Search..' action value={input}
+                                   onChange={(e, { value }) => this.setState({input: value})}>
+                                <input />
+                                <Select compact options={options} value={search}
+                                        onChange={(e, { value }) => this.setState({search: value})}/>
+                                <Button type='submit' color='blue' disabled={!search}
+                                        onClick={() => this.searchUser(search)}>Search</Button>
+                            </Input>
                         </Menu.Item>
                         <Menu.Item>
                             <Label as='a' color='blue' ribbon='right' size='large'>
@@ -300,11 +359,6 @@ class LoginUsers extends Component {
                 </Segment>
                 <Pagination pointing
                             secondary defaultActivePage={1} activePage={page} onPageChange={(e, { activePage }) => this.selectPage(activePage)} totalPages={Math.round(all.length/100 * 10) / 10} />
-                <Button.Group size='big'>
-                    <Button disabled={filter === "active"} onClick={() => this.handleClick("active")}>Active</Button>
-                    <Button disabled={filter === "inactive"} onClick={() => this.handleClick("inactive")}>Inactive</Button>
-                    <Button disabled={filter === "all"} onClick={() => this.handleClick("all")}>All</Button>
-                </Button.Group>
                 {/*<Button.Group attached='bottom' >*/}
                 {/*    <Button icon onClick={this.getReverce} ><Icon name='angle double left' /></Button>*/}
                 {/*    <Button icon onClick={this.getForward} ><Icon name='angle double right' /></Button>*/}
