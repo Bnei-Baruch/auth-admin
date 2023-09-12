@@ -304,9 +304,9 @@ class LoginUsers extends Component {
                                     <Icon name={date ? 'close' : 'dropdown'} link onClick={() => this.removeFilter("date")} />
                                 }/>}
                                 dateFormat="yyyy-MM-dd"
-                                showYearDropdown
-                                showMonthDropdown
-                                scrollableYearDropdown
+                                // showYearDropdown
+                                // showMonthDropdown
+                                // scrollableYearDropdown
                                 maxDate={new Date()}
                                 openToDate={new Date()}
                                 selected={date ? date : null}
