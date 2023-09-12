@@ -32,7 +32,7 @@ class VhUsers extends Component {
         loading: true,
         input: "",
         first: 0,
-        max: 100,
+        max: 20,
         user_info: {},
         status_from_order: {},
         counts: CLIENTS,
@@ -189,10 +189,11 @@ class VhUsers extends Component {
 
         const max_options = [
             { key: 'l1', text: '10', value: 10 },
-            { key: 'l2', text: '50', value: 50 },
-            { key: 'l3', text: '100', value: 100 },
-            { key: 'l4', text: '500', value: 500 },
-            { key: 'l5', text: '1000', value: 1000 },
+            { key: 'l2', text: '20', value: 20 },
+            { key: 'l3', text: '50', value: 50 },
+            { key: 'l4', text: '100', value: 100 },
+            { key: 'l5', text: '500', value: 500 },
+            { key: 'l6', text: '1000', value: 1000 },
         ]
 
         let users_content = profile_users.map(user => {
