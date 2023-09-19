@@ -358,11 +358,11 @@ class LoginUsers extends Component {
                     </Table>
                 </Segment>
                 <Pagination pointing
-                            secondary defaultActivePage={1} activePage={page} onPageChange={(e, { activePage }) => this.selectPage(activePage)} totalPages={Math.round(all.length/100 * 10) / 10} />
-                {/*<Button.Group attached='bottom' >*/}
-                {/*    <Button icon onClick={this.getReverce} ><Icon name='angle double left' /></Button>*/}
-                {/*    <Button icon onClick={this.getForward} ><Icon name='angle double right' /></Button>*/}
-                {/*</Button.Group>*/}
+                            secondary
+                            defaultActivePage={1}
+                            activePage={page}
+                            onPageChange={(e, { activePage }) => this.selectPage(activePage)}
+                            totalPages={Math.round(all.length/100)} />
             </Container>
         );
     }

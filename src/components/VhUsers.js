@@ -10,7 +10,7 @@ import {
     Dropdown,
     Input,
     Message,
-    Select
+    Select, Pagination, Label
 } from "semantic-ui-react";
 import DatePicker from "react-datepicker";
 import {getAuthData, getVhData} from "../shared/tools";
@@ -20,6 +20,7 @@ import VhEdit from "./VhEdit";
 class VhUsers extends Component {
 
     state = {
+        all: [],
         filters: {},
         users: [],
         profile_users: [],
@@ -32,7 +33,7 @@ class VhUsers extends Component {
         loading: true,
         input: "",
         first: 0,
-        max: 20,
+        max: 20000,
         user_info: {},
         status_from_order: {},
         counts: CLIENTS,
@@ -41,6 +42,7 @@ class VhUsers extends Component {
         date: null,
         membership_type: "",
         open_edit: false,
+        page: 1,
     };
 
     componentDidMount() {
@@ -57,23 +59,37 @@ class VhUsers extends Component {
         const query = Object.keys(filters).map(f => f + "=" + filters[f]);
         let path = empty ? `profile/v1/profiles?skip=${first}&limit=${max}` : `profile/v1/profiles?skip=${first}&limit=${max}&`+ query.join('&');
         getVhData(path, (profile_users) => {
-            this.setState({profile_users, loading: false, input: ""});
+            this.setState({profile_users, users: profile_users, all: profile_users, loading: false, input: ""}, () => {
+                this.selectPage(1)
+            });
             console.log(profile_users)
         });
     };
 
+    selectPage = (value) => {
+        console.log(value)
+        const {users} = this.state;
+        const page_number = value;
+        const page_size = 20;
+        const profile_users = users.slice((page_number - 1) * page_size, page_number * page_size)
+        console.log(profile_users)
+        this.setState({ profile_users, page: value});
+    }
+
     setLangFilter = (language) => {
-        const {filters} = this.state;
+        let {filters, all, users} = this.state;
+        users = Array.from(all)
         if(!language) {
             delete filters["language"];
-            this.setState({filters, language: ""}, () => {
-                this.getData(0, 17);
+            this.setState({users, filters, language: ""}, () => {
+                this.selectPage(1)
             });
             return
         }
         filters.language = language
-        this.setState({filters, language}, () => {
-            this.getData(0, 17);
+        users = users.filter(u => u.first_language === language)
+        this.setState({users, filters, language}, () => {
+            this.selectPage(1)
         });
     };
 
@@ -93,17 +109,19 @@ class VhUsers extends Component {
     };
 
     setStatusFilter = (membership_type)=> {
-        const {filters} = this.state;
+        let {filters, all, users} = this.state;
+        users = Array.from(all)
         if(!membership_type) {
             delete filters["membership-type"];
-            this.setState({filters, membership_type: ""}, () => {
-                this.getData(0, 17);
+            this.setState({users, filters, membership_type: ""}, () => {
+                this.selectPage(1)
             });
             return
         }
         filters["membership-type"] = membership_type
-        this.setState({filters, membership_type}, () => {
-            this.getData(0, 17);
+        users = users.filter(u => u.status.membership_type === membership_type)
+        this.setState({users, filters, membership_type}, () => {
+            this.selectPage(1)
         });
     };
 
@@ -177,7 +195,7 @@ class VhUsers extends Component {
     };
 
     render() {
-        const {profile_users, loading, selected_user, max, language, date,membership_type, input, search} = this.state;
+        const {users, page, profile_users, loading, selected_user, max, language, date,membership_type, input, search} = this.state;
 
         let v = (<Icon color='green' name='checkmark'/>);
         let x = (<Icon color='red' name='close'/>);
@@ -290,6 +308,9 @@ class VhUsers extends Component {
                             </Dropdown>
                         </Menu.Item>
                         <Menu.Item>
+                            <Label size="big">
+                                {users.length}
+                            </Label>
                         </Menu.Item>
                     </Menu.Menu>
                 </Menu>
@@ -321,14 +342,22 @@ class VhUsers extends Component {
                         </Table.Body>
                     </Table>
                 </Segment>
-                <Button.Group attached='bottom' compact inverted size='mini'>
-                    <Button icon onClick={this.getReverce} ><Icon name='angle double left' /></Button>
-                    <Button>
-                        <Select compact options={max_options} value={max}
-                                onChange={(e, { value }) => this.setState({max: value})}/>
-                    </Button>
-                    <Button icon onClick={this.getForward} ><Icon name='angle double right' /></Button>
-                </Button.Group>
+                <Pagination pointing
+                            secondary
+                            defaultActivePage={1}
+                            boundaryRange={10}
+                            activePage={page}
+                            onPageChange={(e, { activePage }) => this.selectPage(activePage)}
+                            totalPages={Math.round(users.length/100)}>
+                </Pagination>
+                {/*<Button.Group attached='bottom' compact inverted size='mini'>*/}
+                {/*    <Button icon onClick={this.getReverce} ><Icon name='angle double left' /></Button>*/}
+                {/*    <Button>*/}
+                {/*        <Select compact options={max_options} value={max}*/}
+                {/*                onChange={(e, { value }) => this.setState({max: value})}/>*/}
+                {/*    </Button>*/}
+                {/*    <Button icon onClick={this.getForward} ><Icon name='angle double right' /></Button>*/}
+                {/*</Button.Group>*/}
             </Container>
         );
     }
