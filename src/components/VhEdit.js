@@ -36,7 +36,7 @@ class VhEdit extends Component {
                     <Segment textAlign='center' className="payment_list" basic >
                         <Table selectable compact='very' className="ingest_table">
                             <Table.Header>
-                                {Object.keys(orders.data[0])?.map(s => {
+                                {orders.data.length !== 0 && Object.keys(orders.data[0])?.map(s => {
                                     return (
                                         <Table.HeaderCell key={s + 'h'}>{s}</Table.HeaderCell>)
                                 })}
@@ -59,7 +59,7 @@ class VhEdit extends Component {
                     <Segment textAlign='center' className="payment_list" basic >
                     <Table selectable compact='very' className="ingest_table">
                         <Table.Header>
-                        {Object.keys(payments.data[0])?.map(s => {
+                        {payments.data.length !== 0 &&  Object.keys(payments.data[0])?.map(s => {
                             return (
                                 <Table.HeaderCell key={s + 'h'}>{s}</Table.HeaderCell>)
                         })}

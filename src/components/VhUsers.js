@@ -74,22 +74,35 @@ class VhUsers extends Component {
         const profile_users = users.slice((page_number - 1) * page_size, page_number * page_size)
         console.log(profile_users)
         this.setState({ profile_users, page: value});
+    };
+
+    filterAction = () => {
+        let {filters, all, users} = this.state;
+        users = Array.from(all)
+        Object.keys(filters).map(k => {
+            if(k === "membership_type") {
+                users = users.filter(u => u.status[k] === filters[k])
+            } else {
+                users = users.filter(u => u[k] === filters[k])
+            }
+        })
+        this.setState({users}, () => {
+            this.selectPage(1)
+        });
     }
 
     setLangFilter = (language) => {
-        let {filters, all, users} = this.state;
-        users = Array.from(all)
+        let {filters} = this.state;
         if(!language) {
-            delete filters["language"];
-            this.setState({users, filters, language: ""}, () => {
-                this.selectPage(1)
+            delete filters["first_language"];
+            this.setState({filters, language: ""}, () => {
+                this.filterAction()
             });
             return
         }
-        filters.language = language
-        users = users.filter(u => u.first_language === language)
-        this.setState({users, filters, language}, () => {
-            this.selectPage(1)
+        filters.first_language = language
+        this.setState({filters, language}, () => {
+            this.filterAction()
         });
     };
 
@@ -109,19 +122,17 @@ class VhUsers extends Component {
     };
 
     setStatusFilter = (membership_type)=> {
-        let {filters, all, users} = this.state;
-        users = Array.from(all)
+        let {filters} = this.state;
         if(!membership_type) {
-            delete filters["membership-type"];
-            this.setState({users, filters, membership_type: ""}, () => {
-                this.selectPage(1)
+            delete filters["membership_type"];
+            this.setState({filters, membership_type: ""}, () => {
+                this.filterAction()
             });
             return
         }
-        filters["membership-type"] = membership_type
-        users = users.filter(u => u.status.membership_type === membership_type)
-        this.setState({users, filters, membership_type}, () => {
-            this.selectPage(1)
+        filters.membership_type = membership_type
+        this.setState({filters, membership_type}, () => {
+            this.filterAction()
         });
     };
 
