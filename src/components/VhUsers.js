@@ -21,6 +21,7 @@ class VhUsers extends Component {
 
     state = {
         all: [],
+        page_size: 20,
         filters: {},
         users: [],
         profile_users: [],
@@ -66,11 +67,16 @@ class VhUsers extends Component {
         });
     };
 
+    setPageSize = (value) => {
+        this.setState({page_size: value}, () => {
+            this.selectPage(1)
+        })
+    }
+
     selectPage = (value) => {
         console.log(value)
-        const {users} = this.state;
+        const {users, page_size} = this.state;
         const page_number = value;
-        const page_size = 20;
         const profile_users = users.slice((page_number - 1) * page_size, page_number * page_size)
         console.log(profile_users)
         this.setState({ profile_users, page: value});
@@ -206,7 +212,7 @@ class VhUsers extends Component {
     };
 
     render() {
-        const {users, page, profile_users, loading, selected_user, max, language, date,membership_type, input, search} = this.state;
+        const {page_size, users, page, profile_users, loading, selected_user, max, language, date,membership_type, input, search} = this.state;
 
         let v = (<Icon color='green' name='checkmark'/>);
         let x = (<Icon color='red' name='close'/>);
@@ -353,22 +359,22 @@ class VhUsers extends Component {
                         </Table.Body>
                     </Table>
                 </Segment>
+                {/*<Button.Group attached='bottom' compact inverted size='mini'>*/}
+                {/*    <Button icon onClick={this.getReverce} ><Icon name='angle double left' /></Button>*/}
+                {/*    <Button>*/}
+                        <Select compact options={max_options} value={page_size}
+                                onChange={(e, { value }) => this.setPageSize(value)}/>
+                {/*    </Button>*/}
+                {/*    <Button icon onClick={this.getForward} ><Icon name='angle double right' /></Button>*/}
+                {/*</Button.Group>*/}
                 <Pagination pointing
                             secondary
                             defaultActivePage={1}
                             boundaryRange={10}
                             activePage={page}
                             onPageChange={(e, { activePage }) => this.selectPage(activePage)}
-                            totalPages={Math.round(users.length/100)}>
+                            totalPages={Math.round(users.length/page_size)}>
                 </Pagination>
-                {/*<Button.Group attached='bottom' compact inverted size='mini'>*/}
-                {/*    <Button icon onClick={this.getReverce} ><Icon name='angle double left' /></Button>*/}
-                {/*    <Button>*/}
-                {/*        <Select compact options={max_options} value={max}*/}
-                {/*                onChange={(e, { value }) => this.setState({max: value})}/>*/}
-                {/*    </Button>*/}
-                {/*    <Button icon onClick={this.getForward} ><Icon name='angle double right' /></Button>*/}
-                {/*</Button.Group>*/}
             </Container>
         );
     }

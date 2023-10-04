@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import {Menu, Modal, Icon, Table, Loader, Button, Popup, Form, Header, Segment, Divider} from 'semantic-ui-react'
+import {Menu, Modal, Icon, Table, Loader, Button, Popup, Form, Header, Segment, Divider, Grid} from 'semantic-ui-react'
 
 class VhEdit extends Component {
 
@@ -16,6 +16,16 @@ class VhEdit extends Component {
         const {keycloak_id,first_name_latin,last_name_latin,country,city,first_language,primary_email,created_at,study_start_year,status} = selected_user;
 
         if(!selected_user) return
+
+        const copy = Object.assign({}, selected_user)
+
+        delete copy.status
+        let user = Object.keys(copy);
+        const mi = Math.floor(user.length / 2);
+        const user_p1 = user.slice(0, mi);
+        const user_p2 = user.slice(mi);
+
+        console.log(user_p1,user_p2)
 
         let v = (<Icon name='checkmark' color='green' />);
         let x = (<Icon name='close'/>);
@@ -34,7 +44,7 @@ class VhEdit extends Component {
 
                     <Divider horizontal>Orders</Divider>
                     <Segment textAlign='center' className="payment_list" basic >
-                        <Table selectable compact='very' className="ingest_table">
+                        <Table selectable compact='very' className="ingest_table" singleLine>
                             <Table.Header>
                                 {orders.data.length !== 0 && Object.keys(orders.data[0])?.map(s => {
                                     return (
@@ -59,7 +69,7 @@ class VhEdit extends Component {
                     <Segment textAlign='center' className="payment_list" basic >
                     <Table selectable compact='very' className="ingest_table">
                         <Table.Header>
-                        {payments.data.length !== 0 &&  Object.keys(payments.data[0])?.map(s => {
+                        {payments.data.length !== 0 && Object.keys(payments.data[0])?.map(s => {
                             return (
                                 <Table.HeaderCell key={s + 'h'}>{s}</Table.HeaderCell>)
                         })}
@@ -76,6 +86,36 @@ class VhEdit extends Component {
                             }
                         )}
                     </Table>
+                    </Segment>
+
+                    <Divider horizontal>User</Divider>
+                    <Segment textAlign='center' basic >
+                        <Grid divided='vertically'>
+                            <Grid.Row columns={2}>
+                                <Grid.Column>
+                                    <Table compact='very'>
+                                        {user_p1?.map(s => {
+                                            if(selected_user[s] === "") return
+                                            return (<Table.Row className='table_header'>
+                                                <Table.HeaderCell key={s} width={5}>{s}</Table.HeaderCell>
+                                                <Table.Cell key={s + 'val'} >{selected_user[s]}</Table.Cell>
+                                            </Table.Row>)
+                                        })}
+                                    </Table>
+                                </Grid.Column>
+                                <Grid.Column>
+                                    <Table compact='very'>
+                                        {user_p2?.map(s => {
+                                            if(selected_user[s] === "") return
+                                            return (<Table.Row className='table_header'>
+                                                <Table.HeaderCell key={s} width={5}>{s}</Table.HeaderCell>
+                                                <Table.Cell key={s + 'val'} >{selected_user[s]}</Table.Cell>
+                                            </Table.Row>)
+                                        })}
+                                    </Table>
+                                </Grid.Column>
+                            </Grid.Row>
+                        </Grid>
                     </Segment>
 
                     <Divider horizontal>Status</Divider>
