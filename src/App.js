@@ -20,13 +20,15 @@ class App extends Component {
     user: null,
     auth_admin: false,
     auth_root: false,
+    vh_admin: false
   };
 
   checkPermission = (user) => {
     const auth_admin = kc.hasRealmRole("auth_admin");
     const auth_root = kc.hasRealmRole("auth_root");
-    if(auth_root || auth_admin) {
-      this.setState({user, auth_admin, auth_root});
+    const vh_admin = auth_root || kc.hasRealmRole("vh_admin");
+    if(auth_root || auth_admin || vh_admin) {
+      this.setState({user, auth_admin, vh_admin});
     } else {
       alert("Access denied!");
       kc.logout();
@@ -35,14 +37,14 @@ class App extends Component {
 
   render() {
 
-    const {auth_root, auth_admin,user} = this.state;
+    const {vh_admin, auth_admin,user} = this.state;
 
     let login = (<LoginPage user={user} checkPermission={this.checkPermission} />);
 
     const panes = [
       { menuItem: { key: 'Home', icon: 'home', content: 'Home', disabled: false },
         render: () => <Tab.Pane attached={true} >{login}</Tab.Pane> },
-      { menuItem: { key: 'vh', icon: 'credit card outline', content: 'VH', disabled: !auth_root },
+      { menuItem: { key: 'vh', icon: 'credit card outline', content: 'VH', disabled: !vh_admin },
         render: () => <Tab.Pane attached={false} ><VhUsers user={user} /></Tab.Pane> },
       { menuItem: { key: 'login', icon: 'chain', content: 'Login', disabled: !auth_admin },
         render: () => <Tab.Pane attached={false} ><LoginUsers user={user} /></Tab.Pane> },

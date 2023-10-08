@@ -36,7 +36,7 @@ class VhEdit extends Component {
         let p = (<Icon color='blue' name='cogs'/>);
 
         return (
-            <Modal open={open_edit} onClose={() => this.props.closeModal()} size='fullscreen' >
+            <Modal open={open_edit} closeIcon onClose={() => this.props.closeModal()} size='fullscreen' >
                 {/*<Modal.Header>*/}
                     {/*<Header textAlign="center" >Edit User</Header>*/}
                 {/*</Modal.Header>*/}
