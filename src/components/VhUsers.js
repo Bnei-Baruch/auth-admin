@@ -48,10 +48,10 @@ class VhUsers extends Component {
 
     componentDidMount() {
        this.getData(0, 17)
-        getVhData(`pay/payments/activities`, (order_users) => {
-            console.log("ACTIVITIES", order_users)
-            this.setState({order_users});
-        });
+        // getVhData(`pay/payments/activities`, (order_users) => {
+        //     console.log("ACTIVITIES", order_users)
+        //     this.setState({order_users});
+        // });
     };
 
     getData = (first) => {
@@ -200,10 +200,20 @@ class VhUsers extends Component {
         this.setState({loading: true});
         const {search, input, users} = this.state;
         //let path = empty ? `profile/v1/profiles?skip=${first}&limit=${max}` : `profile/v1/profiles?skip=${first}&limit=${max}&`+ query.join('&');
-        getVhData(`profile/v1/profiles?${search}=${input}`, (profile_users) => {
-            this.setState({profile_users, loading: false, input: ""});
-            console.log(profile_users)
-        });
+        if(search === "paramx") {
+            getVhData(`pay/payments/payment/${input}`, (data) => {
+                console.log("PARAMX", data);
+                getVhData(`profile/v1/profiles?email=${data.Email}`, (profile_users) => {
+                    this.setState({profile_users, loading: false, input: ""});
+                    console.log(profile_users)
+                });
+            });
+        } else {
+            getVhData(`profile/v1/profiles?${search}=${input}`, (profile_users) => {
+                this.setState({profile_users, loading: false, input: ""});
+                console.log(profile_users)
+            });
+        }
         // getAuthData(`${AUTH_API}/find?${search}=${input}`, (response) => {
         //     users.push(response)
         //     console.log(response)
@@ -220,6 +230,7 @@ class VhUsers extends Component {
         const options = [
             { key: 'email', text: 'Mail', value: 'email' },
             { key: 'name', text: 'Name', value: 'name' },
+            { key: 'paramx', text: 'ParamX', value: 'paramx' },
         ]
 
         const max_options = [

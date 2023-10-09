@@ -26,6 +26,7 @@ class VhActivity extends Component {
         users: [],
         profile_users: [],
         order_users: [],
+        orders: [],
         payments: [],
         selected_user: "",
         selected_client: "",
@@ -34,7 +35,7 @@ class VhActivity extends Component {
         loading: true,
         input: "",
         first: 0,
-        max: 20000,
+        max: 20,
         user_info: {},
         status_from_order: {},
         counts: CLIENTS,
@@ -48,29 +49,26 @@ class VhActivity extends Component {
 
     componentDidMount() {
        //this.getData(0, 17)
-        getVhData(`pay/payments/activities`, (order_users) => {
+        getVhData(`pay/payments/activities?skip=0&limit=100`, (order_users) => {
             console.log("ACTIVITIES", order_users)
             this.setState({order_users: order_users.data, loading: false});
         });
     };
 
     getData = (first) => {
+        this.setState({loading: true});
         const {filters, max} = this.state;
         let empty = Object.keys(filters).length === 0
         const query = Object.keys(filters).map(f => f + "=" + filters[f]);
-        let path = empty ? `profile/v1/profiles?skip=${first}&limit=${max}` : `profile/v1/profiles?skip=${first}&limit=${max}&`+ query.join('&');
-        getVhData(path, (profile_users) => {
-            this.setState({profile_users, users: profile_users, all: profile_users, loading: false, input: ""}, () => {
-                this.selectPage(1)
-            });
-            console.log(profile_users)
+        let path = empty ? `pay/payments/activities?skip=${first}&limit=${max}` : `pay/payments/activities?skip=${first}&limit=${max}&`+ query.join('&');
+        getVhData(path, (order_users) => {
+            this.setState({order_users: order_users.data, loading: false});
+            console.log(order_users)
         });
     };
 
     setPageSize = (value) => {
-        this.setState({page_size: value}, () => {
-            this.selectPage(1)
-        })
+        this.setState({max: value})
     }
 
     selectPage = (value) => {
@@ -177,7 +175,11 @@ class VhActivity extends Component {
             this.setState({status_from_order})
             console.log(status_from_order)
         });
-        this.setState({selected_user: user, open_edit: true});
+        getVhData(`profile/v1/profiles?email=${email}`, (profile_users) => {
+            this.setState({selected_user: profile_users[0], open_edit: true});
+            console.log(profile_users)
+        });
+        //this.setState({selected_user: user, open_edit: true});
         // const {search, input, users} = this.state;
         // getAuthData(`${AUTH_API}/find?id=${id}`, (response) => {
         //     getAuthData(`${AUTH_API}/user/${id}`, (user_info) => {
@@ -236,7 +238,7 @@ class VhActivity extends Component {
             const {additional_details_param_x,amount,cc_exp_date,country,created_at,currency,email,first_name,last_name,order_id,payment_status,payment_type,product_type,type} = user;
             const {membership,membership_type,ticket,convention,galaxy} = status
             //const created_at = new Date(time).toUTCString();
-            return (<Table.Row key={email}
+            return (<Table.Row key={order_id}
                                active={email === selected_user}
                                onClick={() => this.selectUser(email, user)} >
                     <Table.Cell>{additional_details_param_x}</Table.Cell>
@@ -263,14 +265,14 @@ class VhActivity extends Component {
                 <Menu size='large' secondary>
                     <Menu.Item>
                         <Menu.Item>
-                            <Input type='text' placeholder='Search..' action value={input}
-                                   onChange={(e, { value }) => this.setState({input: value})}>
-                                <input />
-                                <Select compact options={options} value={search}
-                                        onChange={(e, { value }) => this.setState({search: value})}/>
-                                <Button type='submit' color='blue' disabled={!search}
-                                        onClick={() => this.searchUser(search)}>Search</Button>
-                            </Input>
+                            {/*<Input type='text' placeholder='Search..' action value={input}*/}
+                            {/*       onChange={(e, { value }) => this.setState({input: value})}>*/}
+                            {/*    <input />*/}
+                            {/*    <Select compact options={options} value={search}*/}
+                            {/*            onChange={(e, { value }) => this.setState({search: value})}/>*/}
+                            {/*    <Button type='submit' color='blue' disabled={!search}*/}
+                            {/*            onClick={() => this.searchUser(search)}>Search</Button>*/}
+                            {/*</Input>*/}
                         </Menu.Item>
                         {/*<DatePicker disabled*/}
                         {/*    // locale={locale}*/}
@@ -292,30 +294,30 @@ class VhActivity extends Component {
 
                     </Menu.Menu>
                     <Menu.Menu position='right'>
-                        <Menu.Item>
-                            <Dropdown
-                                placeholder="Language:"
-                                selection
-                                clearable
-                                options={lang_options}
-                                language={language}
-                                onChange={(e, {value}) => this.setLangFilter(value)}
-                                value={language}>
-                            </Dropdown>
-                            <Dropdown
-                                placeholder="Status:"
-                                selection
-                                clearable
-                                options={mem_status_options}
-                                onChange={(e, {value}) => this.setStatusFilter(value)}
-                                value={membership_type}>
-                            </Dropdown>
-                        </Menu.Item>
-                        <Menu.Item>
-                            <Label size="big">
-                                {users.length}
-                            </Label>
-                        </Menu.Item>
+                        {/*<Menu.Item>*/}
+                        {/*    <Dropdown*/}
+                        {/*        placeholder="Language:"*/}
+                        {/*        selection*/}
+                        {/*        clearable*/}
+                        {/*        options={lang_options}*/}
+                        {/*        language={language}*/}
+                        {/*        onChange={(e, {value}) => this.setLangFilter(value)}*/}
+                        {/*        value={language}>*/}
+                        {/*    </Dropdown>*/}
+                        {/*    <Dropdown*/}
+                        {/*        placeholder="Status:"*/}
+                        {/*        selection*/}
+                        {/*        clearable*/}
+                        {/*        options={mem_status_options}*/}
+                        {/*        onChange={(e, {value}) => this.setStatusFilter(value)}*/}
+                        {/*        value={membership_type}>*/}
+                        {/*    </Dropdown>*/}
+                        {/*</Menu.Item>*/}
+                        {/*<Menu.Item>*/}
+                        {/*    <Label size="big">*/}
+                        {/*        {users.length}*/}
+                        {/*    </Label>*/}
+                        {/*</Menu.Item>*/}
                     </Menu.Menu>
                 </Menu>
                 </Message>
@@ -342,78 +344,32 @@ class VhActivity extends Component {
                                 <Table.Cell width={1}>order_id</Table.Cell>
                                 <Table.Cell width={1}>payment_status</Table.Cell>
                                 <Table.Cell width={1}>payment_type</Table.Cell>
-                                <Table.Cell width={1}>product_type</Table.Cell>
+                                <Table.Cell width={2}>product_type</Table.Cell>
                                 <Table.Cell width={1}>type</Table.Cell>
                             </Table.Row>
                             {users_content}
                         </Table.Body>
                     </Table>
                 </Segment>
-                {/*<Button.Group attached='bottom' compact inverted size='mini'>*/}
-                {/*    <Button icon onClick={this.getReverce} ><Icon name='angle double left' /></Button>*/}
-                {/*    <Button>*/}
-                        <Select compact options={max_options} value={page_size}
+                <Button.Group attached='bottom' compact inverted size='mini'>
+                    <Button icon onClick={this.getReverce} ><Icon name='angle double left' /></Button>
+                    <Button>
+                        <Select compact options={max_options} value={max}
                                 onChange={(e, { value }) => this.setPageSize(value)}/>
-                {/*    </Button>*/}
-                {/*    <Button icon onClick={this.getForward} ><Icon name='angle double right' /></Button>*/}
-                {/*</Button.Group>*/}
-                <Pagination pointing
-                            secondary
-                            defaultActivePage={1}
-                            boundaryRange={10}
-                            activePage={page}
-                            onPageChange={(e, { activePage }) => this.selectPage(activePage)}
-                            totalPages={Math.round(users.length/page_size)}>
-                </Pagination>
+                    </Button>
+                    <Button icon onClick={this.getForward} ><Icon name='angle double right' /></Button>
+                </Button.Group>
+                {/*<Pagination pointing*/}
+                {/*            secondary*/}
+                {/*            defaultActivePage={1}*/}
+                {/*            boundaryRange={10}*/}
+                {/*            activePage={page}*/}
+                {/*            onPageChange={(e, { activePage }) => this.selectPage(activePage)}*/}
+                {/*            totalPages={Math.round(users.length/page_size)}>*/}
+                {/*</Pagination>*/}
             </Container>
         );
     }
 }
-
-additional_details_param_x
-    :
-    null
-amount
-    :
-    10
-cc_exp_date
-    :
-    null
-cc_number
-    :
-    null
-country
-    :
-    "None"
-created_at
-    :
-    "2023-10-08T09:36:43.40421Z"
-currency
-    :
-    "USD"
-email
-    :
-    "israelvwv@gmail.com"
-first_name
-    :
-    "ישראלchfhch"
-last_name
-    :
-    "ספקטור"
-order_id
-    :
-    62991
-payment_status
-    :
-    "pending"
-payment_type
-    :
-    "pelecard"
-product_type
-    :
-    "globalmembership"
-type
-    :
-    "recurring"
 
 export default VhActivity;
