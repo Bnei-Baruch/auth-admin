@@ -198,8 +198,15 @@ class VhUsers extends Component {
 
     searchUser = () => {
         this.setState({loading: true});
-        const {search, input, users} = this.state;
+        let {search, input, users,all} = this.state;
         //let path = empty ? `profile/v1/profiles?skip=${first}&limit=${max}` : `profile/v1/profiles?skip=${first}&limit=${max}&`+ query.join('&');
+        if(input === "") {
+            users = all
+            this.setState({users, loading: false}, () => {
+                this.selectPage(1)
+            });
+            return
+        }
         if(search === "paramx") {
             getVhData(`pay/payments/payment/${input}`, (data) => {
                 console.log("PARAMX", data);
