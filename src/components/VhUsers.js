@@ -33,21 +33,21 @@ class VhUsers extends Component {
         disabled: true,
         loading: true,
         input: "",
-        first: 0,
-        max: 20000,
+        first: 1,
+        max: 10,
         user_info: {},
         status_from_order: {},
         counts: CLIENTS,
-        total: 0,
+        total: 12096,
         language: "",
         date: null,
         membership_type: "",
         open_edit: false,
-        page: 1,
+        page: 0,
     };
 
     componentDidMount() {
-       this.getData(0, 17)
+       this.getData(0)
         // getVhData(`pay/payments/activities`, (order_users) => {
         //     console.log("ACTIVITIES", order_users)
         //     this.setState({order_users});
@@ -55,45 +55,33 @@ class VhUsers extends Component {
     };
 
     getData = (first) => {
-        const {filters, max} = this.state;
+        const {filters, page_size} = this.state;
+        let skip = first * page_size
         let empty = Object.keys(filters).length === 0
         const query = Object.keys(filters).map(f => f + "=" + filters[f]);
-        let path = empty ? `profile/v1/profiles?skip=${first}&limit=${max}` : `profile/v1/profiles?skip=${first}&limit=${max}&`+ query.join('&');
-        getVhData(path, (profile_users) => {
-            this.setState({profile_users, users: profile_users, all: profile_users, loading: false, input: ""}, () => {
-                this.selectPage(1)
-            });
-            console.log(profile_users)
+        let path = empty ? `profile/v1/profiles?skip=${skip}&limit=${page_size}` : `profile/v1/profiles?skip=${skip}&limit=${page_size}&`+ query.join('&');
+        getVhData(path, (users) => {
+            this.setState({users , loading: false, input: ""});
+            console.log(users)
         });
     };
 
     setPageSize = (value) => {
-        this.setState({page_size: value}, () => {
-            this.selectPage(1)
+        this.setState({page_size: value, page: 1}, () => {
+            this.getData(0)
         })
     }
 
     selectPage = (value) => {
         console.log(value)
-        const {users, page_size} = this.state;
-        const page_number = value;
-        const profile_users = users.slice((page_number - 1) * page_size, page_number * page_size)
-        console.log(profile_users)
-        this.setState({ profile_users, page: value});
+        this.setState({page: value});
+        this.getData(value)
     };
 
     filterAction = () => {
         let {filters, all, users} = this.state;
-        users = Array.from(all)
-        Object.keys(filters).map(k => {
-            if(k === "membership_type") {
-                users = users.filter(u => u.status[k] === filters[k])
-            } else {
-                users = users.filter(u => u[k] === filters[k])
-            }
-        })
         this.setState({users}, () => {
-            this.selectPage(1)
+            this.getData(0)
         });
     }
 
@@ -102,13 +90,13 @@ class VhUsers extends Component {
         if(!language) {
             delete filters["first_language"];
             this.setState({filters, language: ""}, () => {
-                this.filterAction()
+                this.getData(0);
             });
             return
         }
         filters.first_language = language
         this.setState({filters, language}, () => {
-            this.filterAction()
+            this.getData(0);
         });
     };
 
@@ -117,13 +105,13 @@ class VhUsers extends Component {
         if(!date) {
             delete filters["date"];
             this.setState({filters, date: ""}, () => {
-                this.getData(0, 17);
+                this.getData(0);
             });
             return
         }
         filters.date = date.toLocaleDateString('sv');
         this.setState({filters, date}, () => {
-            this.getData(0, 17);
+            this.getData(0);
         });
     };
 
@@ -169,11 +157,11 @@ class VhUsers extends Component {
             this.setState({payments})
             console.log("PAYMENTS", payments)
         });
-        getVhData(`pay/v2/orders?email=${user.primary_email}`, (orders) => {
+        getVhData(`pay/v2/orders?email=${user.primary_email}&limit=200`, (orders) => {
             this.setState({orders})
             console.log("ORDERS", orders)
         });
-        getVhData(`pay/status/${user.primary_email}`, (status_from_order) => {
+        getVhData(`profile/v1/membership/kcid/${user.keycloak_id}`, (status_from_order) => {
             this.setState({status_from_order})
             console.log(status_from_order)
         });
@@ -249,7 +237,7 @@ class VhUsers extends Component {
             { key: 'l6', text: '1000', value: 1000 },
         ]
 
-        let users_content = profile_users.map(user => {
+        let users_content = users.map(user => {
             const {keycloak_id,first_name_latin,last_name_latin,country,city,first_language,primary_email,created_at,study_start_year,status} = user;
             const {membership,membership_type,ticket,convention,galaxy} = status
             //const created_at = new Date(time).toUTCString();
@@ -391,7 +379,7 @@ class VhUsers extends Component {
                             boundaryRange={10}
                             activePage={page}
                             onPageChange={(e, { activePage }) => this.selectPage(activePage)}
-                            totalPages={Math.round(users.length/page_size)}>
+                            totalPages={Math.round(12096/page_size)}>
                 </Pagination>
             </Container>
         );
