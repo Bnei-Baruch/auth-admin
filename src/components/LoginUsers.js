@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {Button, Container, Segment, Popup, Table, Icon, Menu, Input, Label, Pagination, Select} from "semantic-ui-react";
+import {Button, Container, Segment, Popup, Table, Icon, Menu, Input, Label, Pagination, Select, Checkbox} from "semantic-ui-react";
 import {getAuthData, getVhData} from "../shared/tools";
 import {AUTH_API, LOGIN_API, NEWUSERS_ID, CLIENTS} from "../shared/env";
 import DatePicker from "react-datepicker";
@@ -26,6 +26,8 @@ class LoginUsers extends Component {
         filter: "all",
         date: null,
         days: null,
+        vh_true: 0,
+        vh_false: 0
     };
 
     componentDidMount() {
@@ -112,7 +114,9 @@ class LoginUsers extends Component {
 
         if(value === "inactive") {
             getAuthData(`${LOGIN_API}/keycloak/time/${selected_client}?before=${days}&limit=10000`, (all) => {
-                this.setState({all, loading: false}, () => {
+                let vh_true = all.filter(u => u.membership).length
+                let vh_false = all.filter(u => !u.membership).length
+                this.setState({all, loading: false, vh_true, vh_false}, () => {
                     this.selectPage(1)
                 });
             })
@@ -120,7 +124,9 @@ class LoginUsers extends Component {
 
         if(value === "active") {
             getAuthData(`${LOGIN_API}/keycloak/time/${selected_client}?after=${days}&limit=10000`, (all) => {
-                this.setState({all, loading: false}, () => {
+                let vh_true = all.filter(u => u.membership).length
+                let vh_false = all.filter(u => !u.membership).length
+                this.setState({all, loading: false, vh_true, vh_false}, () => {
                     this.selectPage(1)
                 });
             })
@@ -210,7 +216,7 @@ class LoginUsers extends Component {
     }
 
     render() {
-        const {days, date, filter, page, all, total, users, selected_client ,selected_user,loading,search,input,user_info, counts} = this.state;
+        const {vh_true, vh_false, date, filter, page, all, total, users, selected_client ,selected_user,loading,search,input,user_info, counts} = this.state;
         const {firstName,lastName,groups,roles,social,credentials,membership} = user_info;
 
         let v = (<Icon color='green' name='checkmark'/>);
@@ -320,6 +326,12 @@ class LoginUsers extends Component {
                                 <Button disabled={!selected_client} onClick={() => this.handleClick("inactive")}>Inactive</Button>
                                 {/*<Button disabled={filter === "all"} onClick={() => this.handleClick("all")}>All</Button>*/}
                             </Button.Group>
+                        </Menu.Item>
+                        <Menu.Item>
+                            {selected_client === "galaxy" && <Checkbox label={`Membership: ${vh_true}`} checked={true} />}
+                        </Menu.Item>
+                        <Menu.Item>
+                            {selected_client === "galaxy" && <Checkbox label={`Membership: ${vh_false}`} checked={false} />}
                         </Menu.Item>
                     </Menu.Menu>
                     <Menu.Menu position='right'>
