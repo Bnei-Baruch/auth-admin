@@ -189,24 +189,25 @@ class VhUsers extends Component {
         let {search, input, users,all} = this.state;
         //let path = empty ? `profile/v1/profiles?skip=${first}&limit=${max}` : `profile/v1/profiles?skip=${first}&limit=${max}&`+ query.join('&');
         if(input === "") {
-            users = all
-            this.setState({users, loading: false}, () => {
-                this.selectPage(1)
-            });
+            this.getData(0)
+            // users = all
+            // this.setState({users, loading: false}, () => {
+            //     this.selectPage(1)
+            // });
             return
         }
         if(search === "paramx") {
             getVhData(`pay/payments/payment/${input}`, (data) => {
                 console.log("PARAMX", data);
-                getVhData(`profile/v1/profiles?email=${data.Email}`, (profile_users) => {
-                    this.setState({profile_users, loading: false, input: ""});
-                    console.log(profile_users)
+                getVhData(`profile/v1/profiles?email=${data.Email}`, (users) => {
+                    this.setState({users, loading: false, input: ""});
+                    console.log(users)
                 });
             });
         } else {
-            getVhData(`profile/v1/profiles?${search}=${input}`, (profile_users) => {
-                this.setState({profile_users, loading: false, input: ""});
-                console.log(profile_users)
+            getVhData(`profile/v1/profiles?${search}=${input}`, (users) => {
+                this.setState({users, loading: false, input: ""});
+                console.log(users)
             });
         }
         // getAuthData(`${AUTH_API}/find?${search}=${input}`, (response) => {
